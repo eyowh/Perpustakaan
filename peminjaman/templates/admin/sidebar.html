@@ -1,0 +1,150 @@
+<style>/* Sidebar dan tombol menu */
+
+.toggle-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1100;
+  background-color: #00b894;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.toggle-button.hidden {
+  display: none;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #2d3436;
+  color: white;
+  padding: 30px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+.sidebar.active {
+  transform: translateX(0);
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #dfe6e9;
+  cursor: pointer;
+}
+
+.sidebar h2 {
+  font-size: 22px;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  color: #81ecec;
+}
+
+.sidebar .welcome {
+  font-size: 16px;
+  margin-bottom: 30px;
+  color: #dfe6e9;
+}
+
+.sidebar a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sidebar a:hover {
+  color: #81ecec;
+}
+
+.nav-group {
+  margin-bottom: 20px;
+}
+
+.nav-group h4 {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #b2bec3;
+  border-bottom: 1px solid #636e72;
+  padding-bottom: 5px;
+}
+
+.logout {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #636e72;
+}
+
+.logout a {
+  color: #d63031;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.logout a:hover {
+  text-decoration: underline;
+}
+
+/* Konten */
+.content {
+  padding: 40px;
+  margin-left: 0;
+  transition: margin-left 0.3s ease;
+}
+
+.content.with-sidebar {
+  margin-left: 250px;
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 20px;
+  }
+}
+</style>
+<button id="menuBtn" class="toggle-button" onclick="openSidebar()">☰ Menu</button>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <button class="close-btn" onclick="closeSidebar()">✖</button>
+  <h2>Admin Panel</h2>
+  <div class="welcome">Selamat datang, Admin!</div>
+
+  <div class="nav-group">
+    <h4>Beranda</h4>
+    <a href="{% url 'dashboard_admin' %}">Beranda</a>
+  </div>
+
+  <div class="nav-group">
+    <h4>Menu</h4>
+    <a href="{% url 'daftar_buku' %}">📘 Daftar Buku</a>
+    <a href="{% url 'tambah_buku' %}">➕ Tambah Buku</a>
+  </div>
+
+  <div class="nav-group">
+    <h4>Laporan</h4>
+    <a href="{% url 'laporan_peminjaman' %}">📄 Laporan Peminjaman</a>
+    <a href="{% url 'biodata_user' %}">👤 Biodata Pengguna</a>
+  </div>
+
+  <div class="logout">
+    <a href="{% url 'logout' %}">Logout</a>
+  </div>
+</div>

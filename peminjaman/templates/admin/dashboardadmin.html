@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Dashboard Admin</title>
   <style>
-    * { box-sizing: border-box; }
+    
 
     body {
       margin: 0;
@@ -110,9 +110,7 @@
       transition: margin-left 0.3s ease;
     }
 
-    .content.with-sidebar {
-      margin-left: 250px;
-    }
+    
 
     h2 {
       text-align: center;
@@ -160,21 +158,30 @@
   <button id="menuBtn" class="toggle-button" onclick="openSidebar()">☰ Menu</button>
 
   <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <button class="close-btn" onclick="closeSidebar()">✖</button>
-    <h2>Admin Panel</h2>
-    <div class="welcome">Selamat datang, Admin!</div>
+ <div class="sidebar" id="sidebar">
+  <button class="close-btn" onclick="closeSidebar()">✖</button>
+  <h2>Admin Panel</h2>
+  <div class="welcome">Selamat datang, Admin!</div>
 
+  <!-- Navigasi: Menu -->
+  <div class="nav-group">
+    <h4 style="margin-bottom: 10px; font-size: 14px; color: #b2bec3; border-bottom: 1px solid #636e72; padding-bottom: 5px;">Menu</h4>
     <a href="{% url 'daftar_buku' %}">📘 Daftar Buku</a>
     <a href="{% url 'tambah_buku' %}">➕ Tambah Buku</a>
-    <a href="{% url 'laporan_peminjaman' %}">📄 Laporan Peminjaman</a>
-    <a href="{% url 'biodata_user' %}">👤 Biodata Pengguna</a>
-
-    <div class="logout">
-      <a href="{% url 'logout' %}">Logout</a>
-    </div>
   </div>
 
+  <!-- Navigasi: Laporan -->
+  <div class="nav-group">
+    <h4 style="margin-bottom: 10px; font-size: 14px; color: #b2bec3; border-bottom: 1px solid #636e72; padding-bottom: 5px;">Laporan</h4>
+    <a href="{% url 'laporan_peminjaman' %}">📄 Laporan Peminjaman</a>
+    <a href="{% url 'biodata_user' %}">👤 Biodata Pengguna</a>
+  </div>
+
+  <!-- Logout -->
+  <div class="logout">
+    <a href="{% url 'logout' %}">Logout</a>
+  </div>
+</div>
   <!-- Konten -->
   <div class="content with-sidebar" id="mainContent">
     <h2>Dashboard Admin</h2>

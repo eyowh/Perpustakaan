@@ -116,6 +116,11 @@
   </style>
 </head>
 <body>
+    <button id="menuBtn" class="toggle-button" onclick="openSidebar()">☰ Menu</button>
+
+<!-- Sidebar -->
+{% include 'admin/sidebar.html' %}
+
 <div class="container">
   <h2>Laporan Peminjaman Buku</h2>
 
@@ -172,4 +177,14 @@
   </div>
 </div>
 </body>
+<script>
+  function openSidebar() {
+    document.getElementById("sidebar").classList.add("active");
+    document.getElementById("menuBtn").classList.add("hidden");
+  }
+  function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("active");
+    document.getElementById("menuBtn").classList.remove("hidden");
+  }
+</script>
 </html>

@@ -66,7 +66,7 @@
       outline: none;
     }
 
-    button {
+    .button-save{
       width: 100%;
       background: linear-gradient(to right, #f2994a, #f2c94c);
       color: white;
@@ -79,7 +79,7 @@
       transition: background 0.3s ease;
     }
 
-    button:hover {
+    .button-save:hover {
       background: linear-gradient(to right, #f39c12, #f1c40f);
     }
 
@@ -113,6 +113,12 @@
   </style>
 </head>
 <body>
+
+
+
+<!-- Sidebar -->
+{% include 'admin/sidebar.html' %}
+
   <div class="container">
     <h2>Tambah Buku Baru</h2>
 
@@ -129,7 +135,7 @@
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       {{ form.as_p }}
-      <button type="submit">Simpan Buku</button>
+      <button class="button-save" type="submit">Simpan Buku</button>
     </form>
 
     <div class="back-link">
@@ -137,4 +143,15 @@
     </div>
   </div>
 </body>
+<script>
+  function openSidebar() {
+    document.getElementById("sidebar").classList.add("active");
+    document.getElementById("menuBtn").classList.add("hidden");
+  }
+  function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("active");
+    document.getElementById("menuBtn").classList.remove("hidden");
+  }
+</script>
+
 </html>
