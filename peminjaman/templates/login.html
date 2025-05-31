@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            background-color: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2d3436;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #0984e3;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #dfe6e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            margin-left: -10px;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #0984e3;
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            background-color: #6c5ce7;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #a29bfe;
+        }
+
+        .errorlist {
+            color: #d63031;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #636e72;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>Login ke Akun Anda</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn" type="submit">Masuk</button>
+        </form>
+        <div class="footer">
+            Belum punya akun? <a href="{% url 'register' %}">Daftar</a>
+        </div>
+    </div>
+</body>
+</html>

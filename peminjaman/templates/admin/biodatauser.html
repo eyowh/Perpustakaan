@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Biodata Pengguna</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    .container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 12px;
+      max-width: 1100px;
+      margin: 0 auto;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      overflow-x: auto;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2d3436;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #dfe6e9;
+      text-align: left;
+    }
+
+    th {
+      background-color: #fab1a0;
+      color: #2d3436;
+    }
+
+    tr:hover {
+      background-color: #f1f2f6;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .back-link a {
+      color: #636e72;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Biodata Pengguna</h2>
+
+    {% if users %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID Pengguna</th>
+          <th>Username</th>
+          <th>Nama Panjang</th>
+          <th>Jenis Kelamin</th>
+          <th>Email</th>
+          <th>Tanggal Lahir</th>
+          <th>Alamat</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.kode_user|default:"-" }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.nama_panjang|default:"-" }}</td>
+          <td>
+            {% if user.jenis_kelamin == 'L' %}
+              Laki-laki
+            {% elif user.jenis_kelamin == 'P' %}
+              Perempuan
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>{{ user.email|default:"-" }}</td>
+          <td>{{ user.tgl_lahir|date:"d M Y"|default:"-" }}</td>
+          <td>{{ user.alamat|default:"-" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p>Tidak ada pengguna ditemukan.</p>
+    {% endif %}
+
+    <div class="back-link">
+      <a href="{% url 'dashboard_admin' %}">← Kembali ke Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

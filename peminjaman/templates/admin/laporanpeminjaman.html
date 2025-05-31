@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Laporan Peminjaman</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #c9ffbf, #ffafbd);
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    .container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 12px;
+      max-width: 1100px;
+      margin: 0 auto;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2d3436;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #dfe6e9;
+      text-align: center;
+    }
+
+    th {
+      background-color: #6c5ce7;
+      color: white;
+    }
+
+    .kembali {
+      color: #00b894;
+      font-weight: bold;
+    }
+
+    .belum {
+      color: #d63031;
+      font-weight: bold;
+    }
+
+    .status {
+      font-weight: bold;
+    }
+
+    .status.dikembalikan {
+      color: #27ae60;
+    }
+
+    .status.belum {
+      color: #e74c3c;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .back-link a {
+      color: #636e72;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      th {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      td {
+        padding: 10px;
+        border: none;
+        position: relative;
+        padding-left: 50%;
+        text-align: left;
+      }
+
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        font-weight: bold;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Laporan Peminjaman Buku</h2>
+
+  <form method="get" style="margin-bottom: 20px; text-align: center;">
+  <input type="text" name="q" placeholder="Cari berdasarkan ID Laporan..." value="{{ query }}" style="padding: 10px; width: 1018px; border-radius: 8px; border: 1px solid #ccc;">
+  <button type="submit" style="padding: 10px 15px; border: none; background-color: #6c5ce7; color: white; border-radius: 8px; font-weight: bold; cursor: pointer;">Cari</button>
+</form>
+
+  {% if data %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID Laporan</th>
+        <th>Username</th>
+        <th>Judul Buku</th>
+        <th>Tanggal Pinjam</th>
+        <th>Rencana Kembali</th>
+        <th>Waktu Dikembalikan</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in data %}
+      <tr>
+        <td data-label="ID Laporan">{{ item.kode_laporan }}</td>
+        <td data-label="Username">{{ item.user.username }}</td>
+        <td data-label="Judul Buku">{{ item.buku.judul }}</td>
+        <td data-label="Tanggal Pinjam">{{ item.tanggal_pinjam|date:"Y-m-d" }}</td>
+        <td data-label="Rencana Kembali">{{ item.tanggal_kembali|date:"Y-m-d" }}</td>
+        <td data-label="Waktu Dikembalikan">
+          {% if item.tanggal_dikembalikan %}
+            <span class="kembali">{{ item.tanggal_dikembalikan|date:"Y-m-d" }}</span>
+          {% else %}
+            <span class="belum">-</span>
+          {% endif %}
+        </td>
+        <td data-label="Status" class="status {% if item.tanggal_dikembalikan %}dikembalikan{% else %}belum{% endif %}">
+          {% if item.tanggal_dikembalikan %}
+            Dikembalikan
+          {% else %}
+            Belum Dikembalikan
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p style="text-align:center;">Tidak ada data peminjaman tersedia.</p>
+  {% endif %}
+
+  <div class="back-link">
+    <a href="{% url 'dashboard_admin' %}">← Kembali ke Dashboard</a>
+  </div>
+</div>
+</body>
+</html>

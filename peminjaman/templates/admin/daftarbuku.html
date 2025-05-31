@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Daftar Buku</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #c6ffdd, #fbd786, #f7797d);
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    .container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 12px;
+      max-width: 1000px;
+      margin: 0 auto;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      overflow-x: auto;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2d3436;
+      margin-bottom: 30px;
+    }
+
+    .actions {
+      text-align: right;
+      margin-bottom: 20px;
+    }
+
+    .actions a {
+      background-color: #00b894;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .actions a:hover {
+      background-color: #55efc4;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #dfe6e9;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: #ffeaa7;
+      color: #2d3436;
+    }
+
+    td a {
+      margin-right: 10px;
+      text-decoration: none;
+      color: #0984e3;
+      font-weight: bold;
+    }
+
+    td a:hover {
+      text-decoration: underline;
+    }
+
+    td img {
+      width: 80px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .back-link a {
+      color: #636e72;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      td img {
+        width: 60px;
+        height: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Daftar Buku</h2>
+
+    <div class="actions">
+      <a href="{% url 'tambah_buku' %}">+ Tambah Buku</a>
+    </div>
+
+    {% if buku_list %}
+    <table>
+      <thead>
+        <tr>
+          <th>Gambar</th>
+          <th>Judul</th>
+          <th>Penulis</th>
+          <th>Penerbit</th>
+          <th>Tahun</th>
+          <th>Stok</th>
+          <th>Dipinjam</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for buku in buku_list %}
+        <tr>
+          <td>
+            {% if buku.gambar %}
+              <img src="{{ buku.gambar.url }}" alt="{{ buku.judul }}">
+            {% else %}
+              <img src="https://via.placeholder.com/80x100?text=No+Image" alt="Tidak ada gambar">
+            {% endif %}
+          </td>
+          <td>{{ buku.judul }}</td>
+          <td>{{ buku.penulis }}</td>
+          <td>{{ buku.penerbit }}</td>
+          <td>{{ buku.tahun_terbit }}</td>
+          <td>{{ buku.stok_buku }}</td>
+          <td>{{ buku.jumlah_dipinjam }}</td>
+          <td>
+            <a href="{% url 'edit_buku' buku.id %}">Edit</a>
+            <a href="{% url 'hapus_buku' buku.id %}" onclick="return confirm('Yakin ingin menghapus buku ini?')">Hapus</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>Tidak ada buku yang tersedia.</p>
+    {% endif %}
+
+    <div class="back-link">
+      <a href="{% url 'dashboard_admin' %}">← Kembali ke Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

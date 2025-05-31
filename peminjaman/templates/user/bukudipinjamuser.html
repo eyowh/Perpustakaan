@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Buku yang Dipinjam</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    .toggle-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1100;
+      background-color: #6c5ce7;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      width: auto;
+      height: 35px;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #2d3436;
+      color: white;
+      padding: 30px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar.active { transform: translateX(0); }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      color: #dfe6e9;
+      cursor: pointer;
+    }
+
+    .sidebar h2 {
+      font-size: 22px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      color: #81ecec;
+    }
+
+    .sidebar .welcome {
+      font-size: 16px;
+      margin-bottom: 30px;
+      color: #dfe6e9;
+    }
+
+    .nav-group { margin-bottom: 20px; }
+
+    .nav-group h4 {
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #b2bec3;
+      border-bottom: 1px solid #636e72;
+      padding-bottom: 5px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 10px 0;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .sidebar a:hover { color: #81ecec; }
+
+    .logout {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #636e72;
+    }
+
+    .logout a {
+      color: #d63031;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .logout a:hover { text-decoration: underline; }
+
+    .container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 12px;
+      max-width: 1000px;
+      margin: 60px auto 0;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2d3436;
+      margin-bottom: 30px;
+    }
+
+    .book-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .book-card {
+      background-color: #ffffff;
+      width: 220px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .book-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .book-card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+    }
+
+    .info {
+      padding: 15px;
+    }
+
+    .info h4 {
+      margin: 0 0 10px;
+      color: #0984e3;
+      font-size: 16px;
+    }
+
+    .info p {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: #636e72;
+    }
+
+    form {
+      padding: 0 15px 15px;
+    }
+
+    button.kembalikan {
+      width: 100%;
+      background-color: #e17055;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button.kembalikan:hover {
+      background-color: #d63031;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .back-link a {
+      text-decoration: none;
+      color: #636e72;
+      font-weight: bold;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+    .toggle-button.hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Tombol Menu -->
+ <button id="menuBtn" class="toggle-button" onclick="toggleSidebar()">☰ Menu</button>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <button class="close-btn" onclick="closeSidebar()">✖</button>
+    <h2>Perpustakaan</h2>
+    <div class="welcome">Halo, {{ request.user.username }}!</div>
+
+    <div class="nav-group">
+      <h4>Menu</h4>
+      <a href="{% url 'dashboard_user' %}">Dashboard</a>
+      <a href="{% url 'pinjam_buku' %}">Pinjam Buku</a>
+      <a href="{% url 'buku_dipinjam_user' %}">Buku yang Dipinjam</a>
+    </div>
+
+    <div class="nav-group">
+      <h4>Profil</h4>
+      <a href="{% url 'update_profil' %}">Update Profil</a>
+    </div>
+
+    <div class="logout">
+      <a href="{% url 'logout' %}">Logout</a>
+    </div>
+  </div>
+
+  <!-- Konten -->
+  <div class="container">
+    <h2>Buku yang Sedang Anda Pinjam</h2>
+
+    {% if buku_dipinjam %}
+    <div class="book-list">
+      {% for pem in buku_dipinjam %}
+        <div class="book-card">
+          <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
+          <div class="info">
+            <h4>{{ pem.buku.judul }}</h4>
+            <p>Dipinjam: {{ pem.tanggal_pinjam }}</p>
+            <p>Rencana Kembali: {{ pem.tanggal_kembali }}</p>
+          </div>
+          <form method="post" action="{% url 'kembalikan_buku' pem.id %}">
+            {% csrf_token %}
+            <button type="submit" class="kembalikan">Kembalikan</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <p style="text-align:center;">Anda belum meminjam buku apa pun.</p>
+    {% endif %}
+
+    <div class="back-link">
+      <a href="{% url 'dashboard_user' %}">← Kembali ke Dashboard</a>
+    </div>
+  </div>
+
+  <script>
+     function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const menuBtn = document.getElementById("menuBtn");
+
+    if (sidebar.classList.contains("active")) {
+      sidebar.classList.remove("active");
+      menuBtn.classList.remove("hidden");
+    } else {
+      sidebar.classList.add("active");
+      menuBtn.classList.add("hidden");
+    }
+  }
+
+  function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("active");
+    document.getElementById("menuBtn").classList.remove("hidden");
+  }
+  </script>
+</body>
+</html>

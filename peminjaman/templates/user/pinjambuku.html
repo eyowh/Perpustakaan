@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pinjam Buku</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f6d365, #fda085);
+      min-height: 100vh;
+    }
+
+    .toggle-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1100;
+      background-color: #6c5ce7;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .toggle-button.hidden { display: none; }
+
+    .sidebar {
+      width: 250px;
+      background-color: #2d3436;
+      color: white;
+      padding: 30px 20px;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar.active { transform: translateX(0); }
+
+    .close-btn {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      font-size: 20px;
+      color: #dfe6e9;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .sidebar h2 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #81ecec;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    .sidebar a:hover {
+      color: #81ecec;
+    }
+
+    .content {
+      padding: 40px;
+      margin-left: 0;
+      transition: margin-left 0.3s ease;
+    }
+
+    .content.with-sidebar {
+      margin-left: 250px;
+    }
+
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #d35400;
+      margin-bottom: 30px;
+    }
+
+    .messages {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 30px;
+    }
+
+    .messages li {
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .success {
+      background-color: #e8fce8;
+      color: #27ae60;
+    }
+
+    .error {
+      background-color: #ffe6e6;
+      color: #c0392b;
+    }
+
+    .search-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .search-form input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .search-form button {
+      padding: 10px 20px;
+      background: #e67e22;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .book-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: flex-start;
+    }
+
+    .book-card {
+      width: 220px;
+      background: #fff5e1;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .book-card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+    }
+
+    .book-card .info {
+      padding: 15px;
+      flex-grow: 1;
+    }
+
+    .book-card .info h4 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: #d35400;
+    }
+
+    .book-card .info p {
+      margin: 2px 0;
+      font-size: 13px;
+      color: #636e72;
+    }
+
+    .book-card button {
+      margin: 0 15px 15px;
+      background-color: #e67e22;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      width: 400px;
+      margin: 10% auto;
+      position: relative;
+    }
+
+    .modal-content h3 {
+      margin-top: 0;
+    }
+
+    .modal-content label {
+      font-weight: bold;
+      color: #d35400;
+    }
+
+    .modal-content input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 15px;
+    }
+
+    .modal-content .close {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 22px;
+      color: #c0392b;
+      cursor: pointer;
+    }
+
+    #warning {
+      color: red;
+      font-size: 13px;
+    }
+
+    #submitBtn {
+      width: 100%;
+      padding: 10px;
+      background: #e67e22;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #submitBtn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="menuBtn" class="toggle-button" onclick="toggleSidebar()">☰ Menu</button>
+
+  <div id="sidebar" class="sidebar">
+    <button class="close-btn" onclick="toggleSidebar()">✖</button>
+    <h2>Perpustakaan</h2>
+    <a href="{% url 'dashboard_user' %}">Dashboard</a>
+    <a href="{% url 'pinjam_buku' %}">Pinjam Buku</a>
+    <a href="{% url 'buku_dipinjam_user' %}">Buku Dipinjam</a>
+    <a href="{% url 'update_profil' %}">Update Profil</a>
+    <a href="{% url 'logout' %}">Logout</a>
+  </div>
+
+  <div class="content with-sidebar">
+    <div class="container">
+      <h2>Pinjam Buku</h2>
+
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <form method="get" class="search-form">
+        <input type="text" name="q" placeholder="Cari judul, penulis, atau penerbit..." value="{{ query }}">
+        <button type="submit">Cari</button>
+      </form>
+
+      {% if not profil_lengkap %}
+        <p style="color: red; text-align: center;">
+          ⚠️ Lengkapi profil terlebih dahulu → <a href="{% url 'update_profil' %}">Update Profil</a>
+        </p>
+      {% endif %}
+
+      {% if buku_list %}
+      <div class="book-list">
+        {% for buku in buku_list %}
+        <div class="book-card">
+          <img src="{{ buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}">
+          <div class="info">
+            <h4>{{ buku.judul }}</h4>
+            <p>Penulis: {{ buku.penulis }}</p>
+            <p>Penerbit: {{ buku.penerbit }}</p>
+            <p>Tahun: {{ buku.tahun_terbit }}</p>
+            <p>Stok: {{ buku.stok_buku }}</p>
+          </div>
+          {% if profil_lengkap %}
+          <button onclick="bukaModal('{{ buku.id }}')">Pinjam</button>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="back-link">
+      <a href="{% url 'dashboard_user' %}">← Kembali ke Dashboard</a>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="pinjamModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="tutupModal()">&times;</span>
+      <h3>Formulir Peminjaman</h3>
+      <form method="post" action="{% url 'pinjam_buku' %}">
+        {% csrf_token %}
+        <input type="hidden" name="buku_id" id="buku_id">
+        <label for="tanggal_pinjam">Tanggal Pinjam:</label>
+        <input type="date" id="tanggal_pinjam" name="tanggal_pinjam" readonly required>
+        <label for="tanggal_kembali">Tanggal Kembali:</label>
+        <input type="date" id="tanggal_kembali" name="tanggal_kembali" required>
+        <div id="warning"></div>
+        <button id="submitBtn" type="submit" disabled>Pinjam Buku</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const menuBtn = document.getElementById('menuBtn');
+      sidebar.classList.toggle('active');
+      menuBtn.classList.toggle('hidden');
+    }
+
+    const modal = document.getElementById("pinjamModal");
+    const bukuIdInput = document.getElementById("buku_id");
+    const tanggalPinjamInput = document.getElementById("tanggal_pinjam");
+    const tanggalKembaliInput = document.getElementById("tanggal_kembali");
+    const warning = document.getElementById("warning");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function bukaModal(bukuId) {
+      modal.style.display = "block";
+      bukuIdInput.value = bukuId;
+      const today = new Date().toISOString().split("T")[0];
+      tanggalPinjamInput.value = today;
+      tanggalKembaliInput.value = "";
+      tanggalKembaliInput.min = today;
+      submitBtn.disabled = true;
+    }
+
+    function tutupModal() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(e) {
+      if (e.target === modal) tutupModal();
+    }
+
+    tanggalKembaliInput.addEventListener("input", function () {
+      if (tanggalKembaliInput.value <= tanggalPinjamInput.value) {
+        warning.textContent = "Tanggal kembali harus setelah tanggal pinjam.";
+        submitBtn.disabled = true;
+      } else {
+        warning.textContent = "";
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Selamat Datang</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            height: 100vh;
+            background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #2d3436;
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+
+        .sidebar a:hover {
+            color: #81ecec;
+        }
+
+        .content {
+            flex: 1;
+            padding: 60px;
+            background: #f1f2f6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .content h1 {
+            font-size: 42px;
+            color: #2d3436;
+            margin-bottom: 20px;
+        }
+
+        .content p {
+            font-size: 18px;
+            color: #636e72;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 13px;
+            color: #b2bec3;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div>
+            <h2>Perpustakaan</h2>
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">Register</a>
+        </div>
+        <div class="footer">
+            &copy; 2025 - Sistem Peminjaman Buku
+        </div>
+    </div>
+
+    <div class="content">
+        <h1>Selamat Datang di Perpustakaan Digital</h1>
+        <p>Silakan login atau daftar untuk mulai meminjam buku favorit Anda secara online. Sistem ini memudahkan akses ke koleksi buku terbaru, kapan pun dan di mana pun.</p>
+    </div>
+</body>
+</html>

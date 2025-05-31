@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Pengguna</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+    }
+
+    .toggle-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1100;
+      background-color: #6c5ce7;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .toggle-button.hidden { display: none; }
+
+    .sidebar {
+      width: 250px;
+      background-color: #2d3436;
+      color: white;
+      padding: 30px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar.active { transform: translateX(0); }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      color: #dfe6e9;
+      cursor: pointer;
+    }
+
+    .sidebar h2 {
+      font-size: 22px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      color: #81ecec;
+    }
+
+    .sidebar .welcome {
+      font-size: 16px;
+      margin-bottom: 30px;
+      color: #dfe6e9;
+    }
+
+    .nav-group { margin-bottom: 20px; }
+
+    .nav-group h4 {
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #b2bec3;
+      border-bottom: 1px solid #636e72;
+      padding-bottom: 5px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 10px 0;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .sidebar a:hover { color: #81ecec; }
+
+    .logout {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #636e72;
+    }
+
+    .logout a {
+      color: #d63031;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .logout a:hover { text-decoration: underline; }
+
+    .content {
+      padding: 40px;
+      margin-left: 0;
+      transition: margin-left 0.3s ease;
+    }
+
+    .content.with-sidebar { margin-left: 250px; }
+
+    .section-title {
+      font-size: 20px;
+      color: #2d3436;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+
+    .book-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .book-card {
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      width: 200px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .book-card:hover { transform: translateY(-5px); }
+
+    .book-card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+    }
+
+    .book-card .info {
+      padding: 15px;
+      flex: 1;
+    }
+
+    .book-card .info h4 {
+      margin: 0 0 8px 0;
+      color: #0984e3;
+      font-size: 16px;
+    }
+
+    .book-card .info p {
+      margin: 2px 0;
+      font-size: 13px;
+      color: #636e72;
+    }
+
+    .book-card form {
+      padding: 0 15px 15px;
+    }
+
+    .book-card button {
+      width: 100%;
+      background-color: #d63031;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .book-card button:hover {
+      background-color: #ff7675;
+    }
+
+    @media (max-width: 768px) {
+      .content { padding: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Tombol Menu -->
+  <button id="menuBtn" class="toggle-button" onclick="openSidebar()">☰ Menu</button>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <button class="close-btn" onclick="closeSidebar()">✖</button>
+    <h2>Perpustakaan</h2>
+    <div class="welcome">Halo, {{ nama }}!</div>
+    <div class="nav-group">
+      <h4>Menu</h4>
+      
+      <a href="{% url 'pinjam_buku' %}">Pinjam Buku</a>
+      <a href="{% url 'buku_dipinjam_user' %}">Buku yang Dipinjam</a>
+
+    </div>
+    <div class="nav-group">
+      <h4>Profil</h4>
+      <a href="{% url 'update_profil' %}">Update Profil</a>
+    </div>
+    <div class="logout">
+      <a href="{% url 'logout' %}">Logout</a>
+    </div>
+  </div>
+
+  <!-- Konten -->
+  <div class="content with-sidebar" id="mainContent">
+
+    <!-- Buku Tersedia -->
+    <div class="section-title">📚 Buku Tersedia</div>
+    <div class="book-list">
+      {% for buku in buku_tersedia %}
+        <div class="book-card">
+          <img src="{{ buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ buku.judul }}">
+          <div class="info">
+            <h4>{{ buku.judul }}</h4>
+            <p>Penulis: {{ buku.penulis }}</p>
+            <p>Stok: {{ buku.stok_buku }}</p>
+          </div>
+        </div>
+      {% empty %}
+        <p>Tidak ada buku tersedia.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Buku Populer -->
+    <div class="section-title">🔥 Paling Sering Dipinjam</div>
+    <div class="book-list">
+      {% for buku in buku_populer %}
+        <div class="book-card">
+          <img src="{{ buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ buku.judul }}">
+          <div class="info">
+            <h4>{{ buku.judul }}</h4>
+            <p>Penulis: {{ buku.penulis }}</p>
+            <p>Dipinjam: {{ buku.jumlah_dipinjam }}x</p>
+          </div>
+        </div>
+      {% empty %}
+        <p>Belum ada buku populer.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Buku yang Sedang Dipinjam -->
+    <div class="section-title">📕 Buku yang Dipinjam</div>
+    <div class="book-list">
+      {% for pem in request.user.peminjaman_set.all %}
+        {% if not pem.tanggal_kembali %}
+          <div class="book-card">
+            <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
+            <div class="info">
+              <h4>{{ pem.buku.judul }}</h4>
+              <p>Dipinjam: {{ pem.tanggal_pinjam|date:"d M Y" }}</p>
+            </div>
+            <form method="get" action="{% url 'kembalikan_buku' pem.id %}">
+              <button type="submit">Kembalikan</button>
+            </form>
+          </div>
+        {% endif %}
+      {% empty %}
+        <p>Anda belum meminjam buku.</p>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <script>
+    function openSidebar() {
+      document.getElementById("sidebar").classList.add("active");
+      document.getElementById("menuBtn").classList.add("hidden");
+    }
+
+    function closeSidebar() {
+      document.getElementById("sidebar").classList.remove("active");
+      document.getElementById("menuBtn").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
