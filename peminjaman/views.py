@@ -130,6 +130,7 @@ def pinjam_buku(request):
         'query': query,
         'profil_lengkap': profil_lengkap,
         'today': timezone.now().date().isoformat(),
+        'nama': request.user.nama_panjang,
     })
 
 @login_required
@@ -160,7 +161,9 @@ def buku_dipinjam_user(request):
     ).select_related('buku')
 
     return render(request, 'user/bukudipinjamuser.html', {
-        'buku_dipinjam': buku_dipinjam
+        'buku_dipinjam': buku_dipinjam,
+        'nama': request.user.nama_panjang,
+        
     })
 
 

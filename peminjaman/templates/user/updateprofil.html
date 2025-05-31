@@ -5,6 +5,7 @@
   <title>Update Profil</title>
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -24,6 +25,7 @@
       border-radius: 5px;
       cursor: pointer;
       font-weight: bold;
+      font-size: 14px;
     }
 
     .toggle-button.hidden { display: none; }
@@ -64,12 +66,31 @@
       color: #81ecec;
     }
 
+    .sidebar .welcome {
+      font-size: 16px;
+      margin-bottom: 30px;
+      color: #dfe6e9;
+    }
+
+    .nav-group {
+      margin-bottom: 20px;
+    }
+
+    .nav-group h4 {
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #b2bec3;
+      border-bottom: 1px solid #636e72;
+      padding-bottom: 5px;
+    }
+
     .sidebar a {
       display: block;
       color: white;
       text-decoration: none;
       padding: 10px 0;
       font-size: 14px;
+      font-weight: 500;
     }
 
     .sidebar a:hover {
@@ -85,6 +106,7 @@
     .logout a {
       color: #d63031;
       font-weight: bold;
+      text-decoration: none;
     }
 
     .logout a:hover {
@@ -197,63 +219,68 @@
 </head>
 <body>
 
-  <!-- Tombol Menu -->
-  <button id="menuBtn" class="toggle-button" onclick="toggleSidebar()">☰ Menu</button>
+<!-- Tombol Menu -->
+<button id="menuBtn" class="toggle-button" onclick="toggleSidebar()">☰ Menu</button>
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <button class="close-btn" onclick="closeSidebar()">✖</button>
-    <h2>Perpustakaan</h2>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <button class="close-btn" onclick="closeSidebar()">✖</button>
+  <h2>Perpustakaan</h2>
+  <div class="welcome">Halo, {{ request.user.nama_panjang }}</div>
+
+  <div class="nav-group">
+    <h4>Menu</h4>
     <a href="{% url 'dashboard_user' %}">Dashboard</a>
     <a href="{% url 'pinjam_buku' %}">Pinjam Buku</a>
     <a href="{% url 'buku_dipinjam_user' %}">Buku Dipinjam</a>
+  </div>
+
+  <div class="nav-group">
+    <h4>Profil</h4>
     <a href="{% url 'update_profil' %}">Update Profil</a>
-    <div class="logout">
-      <a href="{% url 'logout' %}">Logout</a>
-    </div>
   </div>
 
-  <!-- Konten -->
-  <div class="main-content with-sidebar">
-    <div class="form-box">
-      <h2>Update Profil</h2>
+  <div class="logout">
+    <a href="{% url 'logout' %}">Logout</a>
+  </div>
+</div>
 
-      {% if user.kode_user %}
-        <div class="info-box">
-          <strong>ID Pengguna:</strong> {{ user.kode_user }}
-        </div>
-      {% endif %}
+<!-- Konten -->
+<div class="main-content with-sidebar">
+  <div class="form-box">
+    <h2>Update Profil</h2>
 
-      <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn" type="submit">Simpan Perubahan</button>
-      </form>
-
-      <div class="back-link">
-        <a href="{% url 'dashboard_user' %}">← Kembali ke Dashboard</a>
+    {% if user.kode_user %}
+      <div class="info-box">
+        <strong>ID Pengguna:</strong> {{ user.kode_user }}
       </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn" type="submit">Simpan Perubahan</button>
+    </form>
+
+    <div class="back-link">
+      <a href="{% url 'dashboard_user' %}">← Kembali ke Dashboard</a>
     </div>
   </div>
+</div>
 
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      const menuBtn = document.getElementById("menuBtn");
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const menuBtn = document.getElementById("menuBtn");
 
-      if (sidebar.classList.contains("active")) {
-        sidebar.classList.remove("active");
-        menuBtn.classList.remove("hidden");
-      } else {
-        sidebar.classList.add("active");
-        menuBtn.classList.add("hidden");
-      }
-    }
+    sidebar.classList.toggle("active");
+    menuBtn.classList.toggle("hidden");
+  }
 
-    function closeSidebar() {
-      document.getElementById("sidebar").classList.remove("active");
-      document.getElementById("menuBtn").classList.remove("hidden");
-    }
-  </script>
+  function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("active");
+    document.getElementById("menuBtn").classList.remove("hidden");
+  }
+</script>
 </body>
 </html>

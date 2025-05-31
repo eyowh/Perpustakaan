@@ -5,6 +5,7 @@
   <title>Pinjam Buku</title>
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,70 +21,108 @@
       background-color: #6c5ce7;
       color: white;
       border: none;
-      padding: 8px 14px;
+      padding: 5px 10px;
       border-radius: 5px;
       cursor: pointer;
       font-weight: bold;
+      font-size: 14px;
+      height: 35px;
     }
 
-    .toggle-button.hidden { display: none; }
+    .toggle-button.hidden {
+      display: none;
+    }
 
     .sidebar {
       width: 250px;
       background-color: #2d3436;
       color: white;
-      padding: 30px 20px;
+      padding: 30px 20px 20px;
+      display: flex;
+      flex-direction: column;
       position: fixed;
-      top: 0; left: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      bottom: 0;
       transform: translateX(-100%);
       transition: transform 0.3s ease;
       z-index: 1000;
     }
 
-    .sidebar.active { transform: translateX(0); }
+    .sidebar.active {
+      transform: translateX(0);
+    }
 
     .close-btn {
       position: absolute;
-      right: 15px;
       top: 15px;
+      right: 15px;
+      background: transparent;
+      border: none;
       font-size: 20px;
       color: #dfe6e9;
-      background: none;
-      border: none;
       cursor: pointer;
     }
 
     .sidebar h2 {
       font-size: 22px;
+      margin-top: 40px;
       margin-bottom: 20px;
       color: #81ecec;
     }
 
+    .sidebar .welcome {
+      font-size: 16px;
+      margin-bottom: 30px;
+      color: #dfe6e9;
+    }
+
+    .nav-group {
+      margin-bottom: 20px;
+    }
+
+    .nav-group h4 {
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #b2bec3;
+      border-bottom: 1px solid #636e72;
+      padding-bottom: 5px;
+    }
+
     .sidebar a {
+      display: block;
       color: white;
       text-decoration: none;
-      display: block;
-      margin: 10px 0;
-      font-weight: bold;
+      padding: 10px 0;
+      font-size: 14px;
+      font-weight: 500;
     }
 
     .sidebar a:hover {
       color: #81ecec;
     }
 
-    .content {
-      padding: 40px;
-      margin-left: 0;
-      transition: margin-left 0.3s ease;
+    .logout {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #636e72;
     }
 
-    .content.with-sidebar {
-      margin-left: 250px;
+    .logout a {
+      color: #d63031;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .logout a:hover {
+      text-decoration: underline;
     }
 
     .container {
+      max-width: 1000px;
+      margin: 60px auto 0;
       background-color: white;
-      padding: 30px;
+      padding: 40px;
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
@@ -94,17 +133,12 @@
       margin-bottom: 30px;
     }
 
-    .messages {
-      list-style: none;
-      padding: 0;
-      margin-bottom: 30px;
-    }
-
     .messages li {
-      padding: 12px;
-      border-radius: 6px;
-      margin-bottom: 10px;
+      list-style: none;
+      padding: 12px 16px;
+      border-radius: 8px;
       font-weight: bold;
+      margin-bottom: 10px;
     }
 
     .success {
@@ -125,18 +159,18 @@
 
     .search-form input {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
       border-radius: 8px;
-      border: 1px solid #ccc;
+      border: 2px solid #dfe6e9;
     }
 
     .search-form button {
-      padding: 10px 20px;
+      padding: 12px 20px;
       background: #e67e22;
       color: white;
-      font-weight: bold;
-      border-radius: 8px;
       border: none;
+      border-radius: 8px;
+      font-weight: bold;
       cursor: pointer;
     }
 
@@ -144,15 +178,15 @@
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
-      justify-content: flex-start;
+      justify-content: center;
     }
 
     .book-card {
-      width: 220px;
-      background: #fff5e1;
+      background-color: #fff5e1;
       border-radius: 10px;
       overflow: hidden;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      width: 240px;
       display: flex;
       flex-direction: column;
     }
@@ -165,24 +199,11 @@
 
     .book-card .info {
       padding: 15px;
-      flex-grow: 1;
-    }
-
-    .book-card .info h4 {
-      margin: 0 0 8px;
-      font-size: 16px;
-      color: #d35400;
-    }
-
-    .book-card .info p {
-      margin: 2px 0;
-      font-size: 13px;
-      color: #636e72;
     }
 
     .book-card button {
-      margin: 0 15px 15px;
-      background-color: #e67e22;
+      margin: 10px 15px 15px;
+      background: #e67e22;
       color: white;
       padding: 10px;
       border: none;
@@ -191,66 +212,31 @@
       cursor: pointer;
     }
 
-    .back-link {
-      text-align: center;
-      margin-top: 30px;
-    }
-
     .modal {
-      display: none;
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.5);
       z-index: 999;
+      display: none;
     }
 
     .modal-content {
       background: white;
-      padding: 30px;
-      border-radius: 12px;
       width: 400px;
       margin: 10% auto;
+      padding: 30px;
+      border-radius: 12px;
       position: relative;
     }
 
-    .modal-content h3 {
-      margin-top: 0;
-    }
-
-    .modal-content label {
-      font-weight: bold;
-      color: #d35400;
-    }
-
-    .modal-content input[type="date"] {
-      width: 100%;
-      padding: 8px;
-      margin: 5px 0 15px;
-    }
-
-    .modal-content .close {
+    .close {
       position: absolute;
       right: 15px;
       top: 10px;
-      font-size: 22px;
-      color: #c0392b;
-      cursor: pointer;
-    }
-
-    #warning {
-      color: red;
-      font-size: 13px;
-    }
-
-    #submitBtn {
-      width: 100%;
-      padding: 10px;
-      background: #e67e22;
-      color: white;
-      border: none;
-      border-radius: 8px;
+      font-size: 24px;
       font-weight: bold;
+      color: #d63031;
       cursor: pointer;
     }
 
@@ -258,131 +244,151 @@
       background-color: #ccc;
       cursor: not-allowed;
     }
+
+    .back-link {
+      text-align: center;
+      margin-top: 30px;
+    }
   </style>
 </head>
 <body>
 
-  <button id="menuBtn" class="toggle-button" onclick="toggleSidebar()">☰ Menu</button>
+<!-- Tombol Menu -->
+<button id="menuBtn" class="toggle-button" onclick="toggleSidebar()">☰ Menu</button>
 
-  <div id="sidebar" class="sidebar">
-    <button class="close-btn" onclick="toggleSidebar()">✖</button>
-    <h2>Perpustakaan</h2>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <button class="close-btn" onclick="closeSidebar()">✖</button>
+  <h2>Perpustakaan</h2>
+  <div class="welcome">Halo, {{ nama }}!</div>
+
+  <div class="nav-group">
+    <h4>Menu</h4>
     <a href="{% url 'dashboard_user' %}">Dashboard</a>
     <a href="{% url 'pinjam_buku' %}">Pinjam Buku</a>
-    <a href="{% url 'buku_dipinjam_user' %}">Buku Dipinjam</a>
+    <a href="{% url 'buku_dipinjam_user' %}">Buku yang Dipinjam</a>
+  </div>
+
+  <div class="nav-group">
+    <h4>Profil</h4>
     <a href="{% url 'update_profil' %}">Update Profil</a>
+  </div>
+
+  <div class="logout">
     <a href="{% url 'logout' %}">Logout</a>
   </div>
+</div>
 
-  <div class="content with-sidebar">
-    <div class="container">
-      <h2>Pinjam Buku</h2>
+<!-- Konten -->
+<div class="container">
+  <h2>Pinjam Buku</h2>
 
-      {% if messages %}
-      <ul class="messages">
-        {% for message in messages %}
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
         <li class="{{ message.tags }}">{{ message }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
+      {% endfor %}
+    </ul>
+  {% endif %}
 
-      <form method="get" class="search-form">
-        <input type="text" name="q" placeholder="Cari judul, penulis, atau penerbit..." value="{{ query }}">
-        <button type="submit">Cari</button>
-      </form>
+  <form method="get" class="search-form">
+    <input type="text" name="q" placeholder="Cari judul, penulis, atau penerbit..." value="{{ query }}">
+    <button type="submit">Cari</button>
+  </form>
 
-      {% if not profil_lengkap %}
-        <p style="color: red; text-align: center;">
-          ⚠️ Lengkapi profil terlebih dahulu → <a href="{% url 'update_profil' %}">Update Profil</a>
-        </p>
-      {% endif %}
-
-      {% if buku_list %}
-      <div class="book-list">
-        {% for buku in buku_list %}
-        <div class="book-card">
-          <img src="{{ buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}">
-          <div class="info">
-            <h4>{{ buku.judul }}</h4>
-            <p>Penulis: {{ buku.penulis }}</p>
-            <p>Penerbit: {{ buku.penerbit }}</p>
-            <p>Tahun: {{ buku.tahun_terbit }}</p>
-            <p>Stok: {{ buku.stok_buku }}</p>
-          </div>
-          {% if profil_lengkap %}
-          <button onclick="bukaModal('{{ buku.id }}')">Pinjam</button>
-          {% endif %}
-        </div>
-        {% endfor %}
+  {% if buku_list %}
+  <div class="book-list">
+    {% for buku in buku_list %}
+    <div class="book-card">
+      <img src="{{ buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ buku.judul }}">
+      <div class="info">
+        <h4>{{ buku.judul }}</h4>
+        <p>Penulis: {{ buku.penulis }}</p>
+        <p>Penerbit: {{ buku.penerbit }}</p>
+        <p>Tahun: {{ buku.tahun_terbit }}</p>
+        <p>Stok: {{ buku.stok_buku }}</p>
       </div>
+      {% if profil_lengkap %}
+        <button onclick="bukaModal('{{ buku.id }}')">Pinjam</button>
+      {% else %}
+        <button disabled style="background:#ccc; cursor: not-allowed;">Lengkapi Profil</button>
       {% endif %}
     </div>
-
-    <div class="back-link">
-      <a href="{% url 'dashboard_user' %}">← Kembali ke Dashboard</a>
-    </div>
+    {% endfor %}
   </div>
+  {% else %}
+    <p style="text-align:center;">Tidak ada buku ditemukan.</p>
+  {% endif %}
+</div>
 
-  <!-- Modal -->
-  <div id="pinjamModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="tutupModal()">&times;</span>
-      <h3>Formulir Peminjaman</h3>
-      <form method="post" action="{% url 'pinjam_buku' %}">
-        {% csrf_token %}
-        <input type="hidden" name="buku_id" id="buku_id">
-        <label for="tanggal_pinjam">Tanggal Pinjam:</label>
-        <input type="date" id="tanggal_pinjam" name="tanggal_pinjam" readonly required>
-        <label for="tanggal_kembali">Tanggal Kembali:</label>
-        <input type="date" id="tanggal_kembali" name="tanggal_kembali" required>
-        <div id="warning"></div>
-        <button id="submitBtn" type="submit" disabled>Pinjam Buku</button>
-      </form>
-    </div>
+<!-- Modal Form -->
+<div id="pinjamModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="tutupModal()">&times;</span>
+    <h3>Formulir Peminjaman</h3>
+    <form method="post" action="{% url 'pinjam_buku' %}">
+      {% csrf_token %}
+      <input type="hidden" name="buku_id" id="buku_id">
+      <label for="tanggal_pinjam">Tanggal Pinjam:</label>
+      <input type="date" name="tanggal_pinjam" id="tanggal_pinjam" readonly required>
+      <label for="tanggal_kembali">Tanggal Kembali:</label>
+      <input type="date" name="tanggal_kembali" id="tanggal_kembali" required>
+      <p id="warning" style="color:red;"></p>
+      <button type="submit" id="submitBtn" disabled>Pinjam Buku</button>
+    </form>
   </div>
+</div>
 
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const menuBtn = document.getElementById('menuBtn');
-      sidebar.classList.toggle('active');
-      menuBtn.classList.toggle('hidden');
-    }
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const menuBtn = document.getElementById("menuBtn");
 
-    const modal = document.getElementById("pinjamModal");
-    const bukuIdInput = document.getElementById("buku_id");
-    const tanggalPinjamInput = document.getElementById("tanggal_pinjam");
-    const tanggalKembaliInput = document.getElementById("tanggal_kembali");
-    const warning = document.getElementById("warning");
-    const submitBtn = document.getElementById("submitBtn");
+    sidebar.classList.toggle("active");
+    menuBtn.classList.toggle("hidden");
+  }
 
-    function bukaModal(bukuId) {
-      modal.style.display = "block";
-      bukuIdInput.value = bukuId;
-      const today = new Date().toISOString().split("T")[0];
-      tanggalPinjamInput.value = today;
-      tanggalKembaliInput.value = "";
-      tanggalKembaliInput.min = today;
+  function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("active");
+    document.getElementById("menuBtn").classList.remove("hidden");
+  }
+
+  const modal = document.getElementById("pinjamModal");
+  const bukuIdInput = document.getElementById("buku_id");
+  const tanggalPinjamInput = document.getElementById("tanggal_pinjam");
+  const tanggalKembaliInput = document.getElementById("tanggal_kembali");
+  const warning = document.getElementById("warning");
+  const submitBtn = document.getElementById("submitBtn");
+
+  function bukaModal(bukuId) {
+    modal.style.display = "block";
+    bukuIdInput.value = bukuId;
+
+    const today = new Date().toISOString().split("T")[0];
+    tanggalPinjamInput.value = today;
+    tanggalKembaliInput.value = "";
+    tanggalKembaliInput.min = today;
+    submitBtn.disabled = true;
+    warning.textContent = "";
+  }
+
+  function tutupModal() {
+    modal.style.display = "none";
+  }
+
+  window.onclick = function (e) {
+    if (e.target === modal) tutupModal();
+  }
+
+  tanggalKembaliInput.addEventListener("input", function () {
+    if (tanggalKembaliInput.value <= tanggalPinjamInput.value) {
+      warning.textContent = "Tanggal kembali harus setelah tanggal pinjam.";
       submitBtn.disabled = true;
+    } else {
+      warning.textContent = "";
+      submitBtn.disabled = false;
     }
-
-    function tutupModal() {
-      modal.style.display = "none";
-    }
-
-    window.onclick = function(e) {
-      if (e.target === modal) tutupModal();
-    }
-
-    tanggalKembaliInput.addEventListener("input", function () {
-      if (tanggalKembaliInput.value <= tanggalPinjamInput.value) {
-        warning.textContent = "Tanggal kembali harus setelah tanggal pinjam.";
-        submitBtn.disabled = true;
-      } else {
-        warning.textContent = "";
-        submitBtn.disabled = false;
-      }
-    });
-  </script>
+  });
+</script>
 </body>
 </html>
