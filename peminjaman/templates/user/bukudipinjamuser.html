@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -12,6 +13,8 @@
       background: linear-gradient(to right, #e0c3fc, #8ec5fc);
       min-height: 100vh;
       padding: 40px;
+      background: url("{% static 'images/perpush2.jpg' %}") no-repeat center center fixed;
+  background-size: cover;
     }
 
     .toggle-button {
@@ -45,6 +48,17 @@
       transform: translateX(-100%);
       transition: transform 0.3s ease;
       z-index: 1000;
+      background-image: url("{% static 'images/perpush1.jpg' %}");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(45, 52, 54, 0.85); /* Overlay gelap agar teks tetap terbaca */
+      z-index: -1;
     }
 
     .sidebar.active { transform: translateX(0); }
@@ -202,13 +216,13 @@
     .back-link a:hover {
       text-decoration: underline;
     }
+
     .toggle-button.hidden { display: none; }
   </style>
 </head>
 <body>
 
-  <!-- Tombol Menu -->
- <button id="menuBtn" class="toggle-button" onclick="toggleSidebar()">☰ Menu</button>
+  <button id="menuBtn" class="toggle-button" onclick="toggleSidebar()">☰ Menu</button>
 
   <div class="sidebar" id="sidebar">
     <button class="close-btn" onclick="closeSidebar()">✖</button>
@@ -219,7 +233,6 @@
       <a href="{% url 'dashboard_user' %}">Dashboard</a>
       <a href="{% url 'pinjam_buku' %}">Pinjam Buku</a>
       <a href="{% url 'buku_dipinjam_user' %}">Buku yang Dipinjam</a>
-
     </div>
     <div class="nav-group">
       <h4>Profil</h4>
@@ -230,7 +243,6 @@
     </div>
   </div>
 
-  <!-- Konten -->
   <div class="container">
     <h2>Buku yang Sedang Anda Pinjam</h2>
 
@@ -261,23 +273,23 @@
   </div>
 
   <script>
-     function toggleSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    const menuBtn = document.getElementById("menuBtn");
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const menuBtn = document.getElementById("menuBtn");
 
-    if (sidebar.classList.contains("active")) {
-      sidebar.classList.remove("active");
-      menuBtn.classList.remove("hidden");
-    } else {
-      sidebar.classList.add("active");
-      menuBtn.classList.add("hidden");
+      if (sidebar.classList.contains("active")) {
+        sidebar.classList.remove("active");
+        menuBtn.classList.remove("hidden");
+      } else {
+        sidebar.classList.add("active");
+        menuBtn.classList.add("hidden");
+      }
     }
-  }
 
-  function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("active");
-    document.getElementById("menuBtn").classList.remove("hidden");
-  }
+    function closeSidebar() {
+      document.getElementById("sidebar").classList.remove("active");
+      document.getElementById("menuBtn").classList.remove("hidden");
+    }
   </script>
 </body>
 </html>

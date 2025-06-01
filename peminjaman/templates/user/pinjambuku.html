@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -9,7 +10,8 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #f6d365, #fda085);
+      background: url("{% static 'images/perpush2.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
       min-height: 100vh;
     }
 
