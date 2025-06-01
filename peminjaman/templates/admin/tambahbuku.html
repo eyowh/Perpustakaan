@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -9,13 +10,18 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #ffecd2, #fcb69f);
-      min-height: 100vh;
+      background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url("{% static 'images/perpush3.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
     }
+    .overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* tingkat gelap overlay */
+  z-index: 0;}
 
     .container {
       background-color: white;
@@ -24,6 +30,8 @@
       max-width: 600px;
       width: 100%;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      margin: 60px auto;
+       z-index: 1;
     }
 
     h2 {
@@ -107,17 +115,16 @@
 
     @media (max-width: 600px) {
       .container {
+        margin: 30px 10px;
         padding: 30px 25px;
       }
     }
   </style>
 </head>
 <body>
+  <div class="overlay"></div>
 
-
-
-<!-- Sidebar -->
-{% include 'admin/sidebar.html' %}
+  {% include 'admin/sidebar.html' %}
 
   <div class="container">
     <h2>Tambah Buku Baru</h2>
@@ -142,16 +149,16 @@
       <a href="{% url 'daftar_buku' %}">← Kembali ke Daftar Buku</a>
     </div>
   </div>
-</body>
-<script>
-  function openSidebar() {
-    document.getElementById("sidebar").classList.add("active");
-    document.getElementById("menuBtn").classList.add("hidden");
-  }
-  function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("active");
-    document.getElementById("menuBtn").classList.remove("hidden");
-  }
-</script>
 
+  <script>
+    function openSidebar() {
+      document.getElementById("sidebar").classList.add("active");
+      document.getElementById("menuBtn").classList.add("hidden");
+    }
+    function closeSidebar() {
+      document.getElementById("sidebar").classList.remove("active");
+      document.getElementById("menuBtn").classList.remove("hidden");
+    }
+  </script>
+</body>
 </html>

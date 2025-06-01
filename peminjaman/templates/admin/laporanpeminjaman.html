@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,9 +8,22 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #c9ffbf, #ffafbd);
+      background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("{% static 'images/perpush3.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
       min-height: 100vh;
       padding: 40px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      z-index: 0;
     }
 
     .container {
@@ -19,6 +33,8 @@
       max-width: 1100px;
       margin: 0 auto;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      position: relative;
+      z-index: 1;
     }
 
     h2 {
@@ -116,75 +132,78 @@
   </style>
 </head>
 <body>
-    <button id="menuBtn" class="toggle-button" onclick="openSidebar()">☰ Menu</button>
 
-<!-- Sidebar -->
-{% include 'admin/sidebar.html' %}
+  <div class="overlay"></div> <!-- Overlay -->
 
-<div class="container">
-  <h2>Laporan Peminjaman Buku</h2>
+  <button id="menuBtn" class="toggle-button" onclick="openSidebar()">☰ Menu</button>
 
-  <form method="get" style="margin-bottom: 20px; text-align: center;">
-  <input type="text" name="q" placeholder="Cari berdasarkan ID Laporan..." value="{{ query }}" style="padding: 10px; width: 1018px; border-radius: 8px; border: 1px solid #ccc;">
-  <button type="submit" style="padding: 10px 15px; border: none; background-color: #6c5ce7; color: white; border-radius: 8px; font-weight: bold; cursor: pointer;">Cari</button>
-</form>
+  {% include 'admin/sidebar.html' %}
 
-  {% if data %}
-  <table>
-    <thead>
-      <tr>
-        <th>ID Laporan</th>
-        <th>Username</th>
-        <th>Judul Buku</th>
-        <th>Tanggal Pinjam</th>
-        <th>Rencana Kembali</th>
-        <th>Waktu Dikembalikan</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in data %}
-      <tr>
-        <td data-label="ID Laporan">{{ item.kode_laporan }}</td>
-        <td data-label="Username">{{ item.user.username }}</td>
-        <td data-label="Judul Buku">{{ item.buku.judul }}</td>
-        <td data-label="Tanggal Pinjam">{{ item.tanggal_pinjam|date:"Y-m-d" }}</td>
-        <td data-label="Rencana Kembali">{{ item.tanggal_kembali|date:"Y-m-d" }}</td>
-        <td data-label="Waktu Dikembalikan">
-          {% if item.tanggal_dikembalikan %}
-            <span class="kembali">{{ item.tanggal_dikembalikan|date:"Y-m-d" }}</span>
-          {% else %}
-            <span class="belum">-</span>
-          {% endif %}
-        </td>
-        <td data-label="Status" class="status {% if item.tanggal_dikembalikan %}dikembalikan{% else %}belum{% endif %}">
-          {% if item.tanggal_dikembalikan %}
-            Dikembalikan
-          {% else %}
-            Belum Dikembalikan
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-    <p style="text-align:center;">Tidak ada data peminjaman tersedia.</p>
-  {% endif %}
+  <div class="container">
+    <h2>Laporan Peminjaman Buku</h2>
 
-  <div class="back-link">
-    <a href="{% url 'dashboard_admin' %}">← Kembali ke Dashboard</a>
+    <form method="get" style="margin-bottom: 20px; text-align: center;">
+      <input type="text" name="q" placeholder="Cari berdasarkan ID Laporan..." value="{{ query }}" style="padding: 10px; width: 1018px; border-radius: 8px; border: 1px solid #ccc;">
+      <button type="submit" style="padding: 10px 15px; border: none; background-color: #6c5ce7; color: white; border-radius: 8px; font-weight: bold; cursor: pointer;">Cari</button>
+    </form>
+
+    {% if data %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID Laporan</th>
+          <th>Username</th>
+          <th>Judul Buku</th>
+          <th>Tanggal Pinjam</th>
+          <th>Rencana Kembali</th>
+          <th>Waktu Dikembalikan</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data %}
+        <tr>
+          <td data-label="ID Laporan">{{ item.kode_laporan }}</td>
+          <td data-label="Username">{{ item.user.username }}</td>
+          <td data-label="Judul Buku">{{ item.buku.judul }}</td>
+          <td data-label="Tanggal Pinjam">{{ item.tanggal_pinjam|date:"Y-m-d" }}</td>
+          <td data-label="Rencana Kembali">{{ item.tanggal_kembali|date:"Y-m-d" }}</td>
+          <td data-label="Waktu Dikembalikan">
+            {% if item.tanggal_dikembalikan %}
+              <span class="kembali">{{ item.tanggal_dikembalikan|date:"Y-m-d" }}</span>
+            {% else %}
+              <span class="belum">-</span>
+            {% endif %}
+          </td>
+          <td data-label="Status" class="status {% if item.tanggal_dikembalikan %}dikembalikan{% else %}belum{% endif %}">
+            {% if item.tanggal_dikembalikan %}
+              Dikembalikan
+            {% else %}
+              Belum Dikembalikan
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p style="text-align:center;">Tidak ada data peminjaman tersedia.</p>
+    {% endif %}
+
+    <div class="back-link">
+      <a href="{% url 'dashboard_admin' %}">← Kembali ke Dashboard</a>
+    </div>
   </div>
-</div>
+
+  <script>
+    function openSidebar() {
+      document.getElementById("sidebar").classList.add("active");
+      document.getElementById("menuBtn").classList.add("hidden");
+    }
+    function closeSidebar() {
+      document.getElementById("sidebar").classList.remove("active");
+      document.getElementById("menuBtn").classList.remove("hidden");
+    }
+  </script>
 </body>
-<script>
-  function openSidebar() {
-    document.getElementById("sidebar").classList.add("active");
-    document.getElementById("menuBtn").classList.add("hidden");
-  }
-  function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("active");
-    document.getElementById("menuBtn").classList.remove("hidden");
-  }
-</script>
 </html>

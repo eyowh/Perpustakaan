@@ -1,16 +1,26 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <title>Dashboard Admin</title>
   <style>
-    
-
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       min-height: 100vh;
-      background: linear-gradient(to right, #89f7fe, #66a6ff);
+      background: url("{% static 'images/perpush3.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+    }
+
+    /* Overlay latar belakang seluruh halaman */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 0;
     }
 
     .toggle-button {
@@ -45,6 +55,17 @@
       transform: translateX(-100%);
       transition: transform 0.3s ease;
       z-index: 1000;
+      background-image: url("{% static 'images/perpush2.jpg' %}");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(45, 52, 54, 0.85);
+      z-index: -1;
     }
 
     .sidebar.active {
@@ -64,8 +85,8 @@
 
     .sidebar h2 {
       font-size: 22px;
-      margin-top: 40px;
-      margin-bottom: 20px;
+      
+      
       color: #81ecec;
     }
 
@@ -105,17 +126,22 @@
     }
 
     .content {
-      padding: 40px;
+      
       margin-left: 0;
       transition: margin-left 0.3s ease;
+      position: relative;
+      z-index: 1;
     }
-
-    
 
     h2 {
       text-align: center;
-      color: #2d3436;
+      color: #ffffff;
       margin-bottom: 30px;
+      
+      
+      padding: 15px 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
 
     .admin-menu {
@@ -149,16 +175,21 @@
       .content {
         padding: 20px;
       }
+
+      h2 {
+        font-size: 18px;
+        padding: 10px 20px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Tombol Menu -->
-  <button id="menuBtn" class="toggle-button" onclick="openSidebar()">☰ Menu</button>
+<!-- Tombol Menu -->
+<button id="menuBtn" class="toggle-button" onclick="openSidebar()">☰ Menu</button>
 
-  <!-- Sidebar -->
- <div class="sidebar" id="sidebar">
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
   <button class="close-btn" onclick="closeSidebar()">✖</button>
   <h2>Admin Panel</h2>
   <div class="welcome">Selamat datang, Admin!</div>
@@ -182,27 +213,28 @@
     <a href="{% url 'logout' %}">Logout</a>
   </div>
 </div>
-  <!-- Konten -->
-  <div class="content with-sidebar" id="mainContent">
-    <h2>Dashboard Admin</h2>
-    <div class="admin-menu">
-      <a class="admin-card" href="{% url 'daftar_buku' %}">📘 Daftar Buku</a>
-      <a class="admin-card" href="{% url 'tambah_buku' %}">➕ Tambah Buku</a>
-      <a class="admin-card" href="{% url 'laporan_peminjaman' %}">📄 Laporan</a>
-      <a class="admin-card" href="{% url 'biodata_user' %}">👤 Biodata Pengguna</a>
-    </div>
+
+<!-- Konten -->
+<div class="content with-sidebar" id="mainContent">
+  <h2>Dashboard Admin</h2>
+  <div class="admin-menu">
+    <a class="admin-card" href="{% url 'daftar_buku' %}">📘 Daftar Buku</a>
+    <a class="admin-card" href="{% url 'tambah_buku' %}">➕ Tambah Buku</a>
+    <a class="admin-card" href="{% url 'laporan_peminjaman' %}">📄 Laporan</a>
+    <a class="admin-card" href="{% url 'biodata_user' %}">👤 Biodata Pengguna</a>
   </div>
+</div>
 
-  <script>
-    function openSidebar() {
-      document.getElementById("sidebar").classList.add("active");
-      document.getElementById("menuBtn").classList.add("hidden");
-    }
+<script>
+  function openSidebar() {
+    document.getElementById("sidebar").classList.add("active");
+    document.getElementById("menuBtn").classList.add("hidden");
+  }
 
-    function closeSidebar() {
-      document.getElementById("sidebar").classList.remove("active");
-      document.getElementById("menuBtn").classList.remove("hidden");
-    }
-  </script>
+  function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("active");
+    document.getElementById("menuBtn").classList.remove("hidden");
+  }
+</script>
 </body>
 </html>
