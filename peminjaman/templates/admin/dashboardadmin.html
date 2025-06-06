@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="id">
@@ -181,6 +182,56 @@
         padding: 10px 20px;
       }
     }
+
+    .stats-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.stat-box {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 25px 30px;
+  border-radius: 12px;
+  width: 180px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.stat-box:hover {
+  transform: scale(1.05);
+}
+
+.stat-box h3 {
+  margin: 0;
+  font-size: 28px;
+  color: #00b894;
+}
+
+.stat-box p {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: #2d3436;
+  font-weight: 500;
+}
+
+.stat-box h2 {
+    font-size: 2.5rem;         /* Besar dan tegas */
+    font-weight: bold;         /* Tebal */
+    color: #2c3e50;            /* Abu gelap elegan */
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.stat-box h2:hover {
+    transform: scale(1.1);     /* Efek zoom saat hover */
+    color: #1abc9c;            /* Ubah warna saat hover */
+}
   </style>
 </head>
 <body>
@@ -212,11 +263,33 @@
   <div class="logout">
     <a href="{% url 'logout' %}">Logout</a>
   </div>
+<div class="sidebar-footer">
+    <p style="font-size: 0.8rem;">&copy; {% now "Y" %} Perpustakaan</p>
+    <p style="font-size: 0.8rem;">Dibuat Oleh ario(raja) abim irgi bagus</p>
+  </div>
+
 </div>
 
 <!-- Konten -->
+
 <div class="content with-sidebar" id="mainContent">
   <h2>Dashboard Admin</h2>
+<div class="stats-container">
+    <div class="stat-box">
+      <h2>{{ total_buku }}</h2>
+      <p>Total Buku</p>
+    </div>
+    <div class="stat-box">
+      <h2>{{ total_pengguna }}</h2>
+      <p>Pengguna Terdaftar</p>
+    </div>
+    <div class="stat-box">
+      <h2>{{ peminjaman_aktif }}</h2>
+      <p>Peminjaman Aktif</p>
+    </div>
+  </div>
+
+
   <div class="admin-menu">
     <a class="admin-card" href="{% url 'daftar_buku' %}">📘 Daftar Buku</a>
     <a class="admin-card" href="{% url 'tambah_buku' %}">➕ Tambah Buku</a>

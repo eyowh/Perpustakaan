@@ -228,6 +228,11 @@
 }
 
 /* ALERT STYLES */
+.alert-container{
+  display: grid;
+  gap: 10px;
+}
+
 .alert {
   width: 300px;
   padding: 12px 18px;
@@ -239,7 +244,7 @@
   background-color: #636e72;
   border-left: 6px solid #2d3436;
   text-align: left;
-  animation: fadeIn 0.4s ease-in-out;
+  animation: fadeInUp 0.4s ease-in-out;
 }
 
 .alert strong {
@@ -309,10 +314,7 @@
 }
 
 /* ANIMASI */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }
@@ -347,6 +349,10 @@
     <div class="logout">
       <a href="{% url 'logout' %}">Logout</a>
     </div>
+    <div class="sidebar-footer">
+    <p style="font-size: 0.8rem;">&copy; {% now "Y" %} Perpustakaan</p>
+    <p style="font-size: 0.8rem;">Dibuat Oleh ario(raja) abim irgi bagus</p>
+  </div>
   </div>
 
  <div class="notification-stack">

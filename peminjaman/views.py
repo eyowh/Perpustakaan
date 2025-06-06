@@ -190,7 +190,16 @@ def buku_dipinjam_user(request):
 @login_required
 @user_passes_test(is_admin)
 def dashboard_admin(request):
-    return render(request, 'admin/dashboardadmin.html')
+    total_buku = Buku.objects.count()
+    total_pengguna = User.objects.filter(is_staff=False).count()
+    peminjaman_aktif = Peminjaman.objects.filter(tanggal_dikembalikan__isnull=True).count()
+
+    context = {
+        'total_buku': total_buku,
+        'total_pengguna': total_pengguna,
+        'peminjaman_aktif': peminjaman_aktif,
+    }
+    return render(request, 'admin/dashboardadmin.html', context)
 
 @login_required
 @user_passes_test(is_admin)
