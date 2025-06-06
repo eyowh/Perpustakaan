@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from random import randint
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from datetime import timedelta
 
 # Extend default User model
 class User(AbstractUser):
@@ -75,6 +76,19 @@ class Peminjaman(models.Model):
     tanggal_dikembalikan = models.DateField(null=True, blank=True)  # Realisasi
 
     kode_laporan = models.CharField(max_length=30, unique=True, blank=True)
+
+    def status_jatuh_tempo(self):
+        if self.tanggal_dikembalikan:
+            return "Dikembalikan"
+        hari_ini = timezone.now().date()
+        if self.tanggal_kembali < hari_ini:
+            return "Terlambat"
+        elif self.tanggal_kembali == hari_ini:
+            return "Jatuh tempo hari ini"
+        elif self.tanggal_kembali == hari_ini + timedelta(days=1):
+            return "Besok jatuh tempo"
+        else:
+            return "Masih dipinjam"
 
     def save(self, *args, **kwargs):
         if not self.kode_laporan:

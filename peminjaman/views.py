@@ -8,6 +8,11 @@ from django.db.models import Q
 from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime
+from datetime import timedelta
+from django.core.paginator import Paginator
+import openpyxl
+from openpyxl.utils import get_column_letter
+from django.http import HttpResponse
 
 
 def home_view(request):
@@ -53,11 +58,24 @@ def logout_view(request):
 @login_required
 def dashboard_user(request):
     buku_tersedia = Buku.objects.filter(stok_buku__gt=0)
-    buku_populer = Buku.objects.order_by('-jumlah_dipinjam')[:5]  # Top 5
+    buku_populer = Buku.objects.order_by('-jumlah_dipinjam')[:5]
+
+    hari_ini = timezone.now().date()
+    peminjaman_user = Peminjaman.objects.filter(user=request.user, tanggal_dikembalikan__isnull=True)
+
+    # Filter notifikasi
+    jatuh_tempo_hari_ini = peminjaman_user.filter(tanggal_kembali=hari_ini)
+    jatuh_tempo_besok = peminjaman_user.filter(tanggal_kembali=hari_ini + timedelta(days=1))
+    sudah_terlambat = peminjaman_user.filter(tanggal_kembali__lt=hari_ini)
+
     return render(request, 'user/dashboarduser.html', {
         'nama': request.user.nama_panjang,
         'buku_tersedia': buku_tersedia,
         'buku_populer': buku_populer,
+        'jatuh_tempo_hari_ini': jatuh_tempo_hari_ini,
+        'jatuh_tempo_besok': jatuh_tempo_besok,
+        'sudah_terlambat': sudah_terlambat,
+        'buku_dipinjam': peminjaman_user,   # <-- tambah ini
     })
 
 @login_required
@@ -151,7 +169,7 @@ def kembalikan_buku(request, id):
     buku.save()
 
     messages.success(request, f'Buku "{buku.judul}" berhasil dikembalikan.')
-    return redirect('buku_dipinjam_user')
+    return redirect('dashboard_user')
 
 @login_required
 def buku_dipinjam_user(request):
@@ -215,16 +233,35 @@ def hapus_buku(request, id):
 @login_required
 @user_passes_test(is_admin)
 def laporan_peminjaman(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '').strip()
+    bulan = request.GET.get('bulan', '').strip()
 
+    peminjaman_qs = Peminjaman.objects.all().order_by('-tanggal_pinjam')
+
+    # Filter berdasarkan kode laporan
     if query:
-        data = Peminjaman.objects.filter(Q(kode_laporan__icontains=query)).order_by('-tanggal_pinjam')
-    else:
-        data = Peminjaman.objects.all().order_by('-tanggal_pinjam')
+        peminjaman_qs = peminjaman_qs.filter(kode_laporan__icontains=query)
+
+    # Filter berdasarkan bulan dan tahun dari input <input type="month">
+    if bulan:
+        try:
+            tahun, bulan_num = map(int, bulan.split('-'))
+            peminjaman_qs = peminjaman_qs.filter(
+                tanggal_pinjam__year=tahun,
+                tanggal_pinjam__month=bulan_num
+            )
+        except ValueError:
+            pass  # Format tidak valid, abaikan saja
+
+    # Pagination
+    paginator = Paginator(peminjaman_qs, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     return render(request, 'admin/laporanpeminjaman.html', {
-        'data': data,
+        'peminjaman': page_obj,
         'query': query,
+        'bulan': bulan,
     })
 
 @login_required
@@ -232,4 +269,53 @@ def laporan_peminjaman(request):
 def biodata_user(request):
     users = User.objects.filter(is_staff=False)
     return render(request, 'admin/biodatauser.html', {'users': users})
+
+@login_required
+@user_passes_test(is_admin)
+def export_peminjaman_excel(request):
+    # Ambil parameter bulan dari query string: format yyyy-mm
+    bulan_param = request.GET.get("bulan")
+    peminjamans = Peminjaman.objects.select_related("user", "buku")
+
+    if bulan_param:
+        try:
+            # Convert ke bulan dan tahun
+            tahun, bulan = map(int, bulan_param.split('-'))
+            peminjamans = peminjamans.filter(tanggal_pinjam__year=tahun, tanggal_pinjam__month=bulan)
+        except ValueError:
+            pass  # Kalau format salah, tampilkan semua
+
+    # Buat Excel
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Peminjaman Bulan"
+
+    headers = [
+        "Kode Laporan", "Nama User", "Judul Buku",
+        "Tanggal Pinjam", "Tanggal Kembali",
+        "Tanggal Dikembalikan", "Status"
+    ]
+    for col_num, header in enumerate(headers, 1):
+        ws.cell(row=1, column=col_num, value=header)
+
+    for row_num, pinjam in enumerate(peminjamans, 2):
+        ws.cell(row=row_num, column=1, value=pinjam.kode_laporan)
+        ws.cell(row=row_num, column=2, value=pinjam.user.nama_panjang or pinjam.user.username)
+        ws.cell(row=row_num, column=3, value=pinjam.buku.judul)
+        ws.cell(row=row_num, column=4, value=str(pinjam.tanggal_pinjam))
+        ws.cell(row=row_num, column=5, value=str(pinjam.tanggal_kembali))
+        ws.cell(row=row_num, column=6, value=str(pinjam.tanggal_dikembalikan) if pinjam.tanggal_dikembalikan else "-")
+        ws.cell(row=row_num, column=7, value=pinjam.status_jatuh_tempo())
+
+    for col in ws.columns:
+        max_length = max(len(str(cell.value)) if cell.value else 0 for cell in col)
+        ws.column_dimensions[get_column_letter(col[0].column)].width = max_length + 2
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    nama_file = f"peminjaman_{bulan_param or 'semua'}.xlsx"
+    response["Content-Disposition"] = f'attachment; filename="{nama_file}"'
+    wb.save(response)
+    return response
 

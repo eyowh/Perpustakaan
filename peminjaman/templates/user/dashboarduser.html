@@ -215,6 +215,111 @@
     @media (max-width: 768px) {
       .content { padding: 20px; }
     }
+/* Container induk semua notifikasi */
+.notification-stack {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* jarak antar notifikasi */
+  align-items: flex-end;
+}
+
+/* ALERT STYLES */
+.alert {
+  width: 300px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  background-color: #636e72;
+  border-left: 6px solid #2d3436;
+  text-align: left;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.alert strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+
+.alert-danger {
+  background-color: #d63031;
+  border-left-color: #b71c1c;
+}
+
+.alert-warning {
+  background-color: #fdcb6e;
+  border-left-color: #e17055;
+  color: #2d3436;
+}
+
+.alert-info {
+  background-color: #74b9ff;
+  border-left-color: #0984e3;
+}
+
+/* MESSAGES STYLES */
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 300px;
+}
+
+.messages li {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #fff;
+  font-weight: bold;
+  background-color: #636e72;
+  border-left: 6px solid #2d3436;
+  text-align: center;
+  animation: fadeInUp 0.4s ease-in-out;
+}
+
+.messages li.error,
+.messages li.danger,
+.messages li.alert-danger {
+  background-color: #d63031;
+  border-left-color: #b71c1c;
+}
+
+.messages li.warning,
+.messages li.alert-warning {
+  background-color: #fdcb6e;
+  border-left-color: #e17055;
+  color: #2d3436;
+}
+
+.messages li.info,
+.messages li.alert-info {
+  background-color: #74b9ff;
+  border-left-color: #0984e3;
+}
+
+/* ANIMASI */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
   </style>
 </head>
 
@@ -244,28 +349,44 @@
     </div>
   </div>
 
+ <div class="notification-stack">
+  <div class="alert-container">
+    {% if sudah_terlambat %}
+      <div class="alert alert-danger">
+        <strong>⚠ Terlambat!</strong> Anda memiliki {{ sudah_terlambat|length }} buku yang lewat jatuh tempo.
+      </div>
+    {% endif %}
+
+    {% if jatuh_tempo_hari_ini %}
+      <div class="alert alert-warning">
+        <strong>📅 Jatuh Tempo Hari Ini!</strong> {{ jatuh_tempo_hari_ini|length }} buku harus dikembalikan hari ini.
+      </div>
+    {% endif %}
+
+    {% if jatuh_tempo_besok %}
+      <div class="alert alert-info">
+        <strong>🕑 Pengingat!</strong> {{ jatuh_tempo_besok|length }} buku jatuh tempo besok.
+      </div>
+    {% endif %}
+  </div>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+
+
   <!-- Konten -->
   <div class="content with-sidebar" id="mainContent">
 
-    <!-- Buku Tersedia -->
-    <div class="section-title">📚 Buku Tersedia</div>
-    <div class="book-list">
-      {% for buku in buku_tersedia %}
-        <div class="book-card">
-          <img src="{{ buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ buku.judul }}">
-          <div class="info">
-            <h4>{{ buku.judul }}</h4>
-            <p>Penulis: {{ buku.penulis }}</p>
-            <p>Stok: {{ buku.stok_buku }}</p>
-          </div>
-        </div>
-      {% empty %}
-        <p>Tidak ada buku tersedia.</p>
-      {% endfor %}
-    </div>
+
 
     <!-- Buku Populer -->
-    <div class="section-title">🔥 Paling Sering Dipinjam</div>
+    <div style="font-weight: bolder;" class="section-title">Buku Populer</div>
     <div class="book-list">
       {% for buku in buku_populer %}
         <div class="book-card">
@@ -282,25 +403,28 @@
     </div>
 
     <!-- Buku yang Sedang Dipinjam -->
-    <div class="section-title">📕 Buku yang Dipinjam</div>
-    <div class="book-list">
-      {% for pem in request.user.peminjaman_set.all %}
-        {% if not pem.tanggal_kembali %}
-          <div class="book-card">
-            <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
-            <div class="info">
-              <h4>{{ pem.buku.judul }}</h4>
-              <p>Dipinjam: {{ pem.tanggal_pinjam|date:"d M Y" }}</p>
-            </div>
-            <form method="get" action="{% url 'kembalikan_buku' pem.id %}">
-              <button type="submit">Kembalikan</button>
-            </form>
-          </div>
-        {% endif %}
-      {% empty %}
-        <p>Anda belum meminjam buku.</p>
-      {% endfor %}
-    </div>
+<div style="font-weight: bolder;" class="section-title">Buku yang Dipinjam</div>
+<div class="book-list">
+  {% if buku_dipinjam %}
+    {% for pem in buku_dipinjam %}
+      <div class="book-card">
+        <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
+        <div class="info">
+          <h4>{{ pem.buku.judul }}</h4>
+          <p>Dipinjam: {{ pem.tanggal_pinjam|date:"d M Y" }}</p>
+          <p>Harus kembali: {{ pem.tanggal_kembali|date:"d M Y" }}</p>
+          <p>Status: {{ pem.status_jatuh_tempo }}</p>
+        </div>
+        <form method="post" action="{% url 'kembalikan_buku' pem.id %}">
+          {% csrf_token %}
+          <button type="submit">Kembalikan</button>
+        </form>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color: #dfe6e9;">Anda belum meminjam buku.</p>
+  {% endif %}
+</div>
 
   </div>
 
@@ -314,6 +438,33 @@
       document.getElementById("sidebar").classList.remove("active");
       document.getElementById("menuBtn").classList.remove("hidden");
     }
+
+    window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const alerts = document.querySelectorAll('.alert-container .alert');
+      alerts.forEach(alert => {
+        // Tambah animasi fade out
+        alert.style.transition = 'opacity 0.5s ease';
+        alert.style.opacity = '0';
+        // Setelah fade out selesai, sembunyikan dari DOM (optional)
+        setTimeout(() => alert.style.display = 'none', 500);
+      });
+    }, 2000); // 2000ms = 2 detik
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const messages = document.querySelectorAll('.messages li');
+    messages.forEach(function (msg) {
+      setTimeout(() => {
+        // Tambahkan efek fade out
+        msg.style.transition = 'opacity 0.5s ease-out';
+        msg.style.opacity = '0';
+
+        // Hapus elemen dari DOM setelah animasi
+        setTimeout(() => msg.remove(), 500);
+      }, 2000); // 2 detik delay sebelum mulai menghilang
+    });
+  });
   </script>
 </body>
 </html>

@@ -27,15 +27,25 @@
     }
 
     .container {
-      background-color: white;
-      padding: 40px;
-      border-radius: 12px;
-      max-width: 1100px;
-      margin: 0 auto;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      position: relative;
-      z-index: 1;
-    }
+  background-color: white;
+  padding: 40px;
+  border-radius: 12px;
+  max-width: 1100px;
+  margin: -82px auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 1;
+  min-height: calc(110vh - 80px); /* ini menjaga tinggi kontainer stabil */
+  min-width: 1100px;
+  max-height: calc(110vh - 80px) ;
+}
+
+.empty-message {
+  text-align: center;
+  font-size: 16px;
+  color: #2d3436;
+  margin-top: 100px;
+}
 
     h2 {
       text-align: center;
@@ -129,39 +139,136 @@
         font-weight: bold;
       }
     }
+    .pagination {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pagination a, .pagination span {
+      padding: 8px 14px;
+      border-radius: 6px;
+      background-color: #dfe6e9;
+      color: #2d3436;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .pagination .current {
+      background-color: #6c5ce7;
+      color: white;
+    }
+
+    .pagination a:hover {
+      background-color: #a29bfe;
+      color: white;
+    }
+
+    .fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  padding: 15px 40px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000; /* supaya di atas konten lain */
+  max-width: 1100px;
+  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.export-form {
+    display: flex;
+    align-items: center;
+   
+    gap: 12px;
+    margin: 20px 0;
+  }
+  
+  .export-form label {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .export-form input[type="month"] {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  
+  .export-form input[type="month"]:focus {
+    outline: none;
+    border-color: #6c5ce7;
+    box-shadow: 0 0 6px #6c5ce7aa;
+  }
+  
+  .export-form button {
+    background-color: #6c5ce7;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .export-form button:hover {
+    background-color: #574dcf;
+  }
   </style>
 </head>
 <body>
 
-  <div class="overlay"></div> <!-- Overlay -->
-
+  <div class="overlay"></div>
   <button id="menuBtn" class="toggle-button" onclick="openSidebar()">☰ Menu</button>
-
   {% include 'admin/sidebar.html' %}
 
   <div class="container">
     <h2>Laporan Peminjaman Buku</h2>
 
-    <form method="get" style="margin-bottom: 20px; text-align: center;">
-      <input type="text" name="q" placeholder="Cari berdasarkan ID Laporan..." value="{{ query }}" style="padding: 10px; width: 1018px; border-radius: 8px; border: 1px solid #ccc;">
-      <button type="submit" style="padding: 10px 15px; border: none; background-color: #6c5ce7; color: white; border-radius: 8px; font-weight: bold; cursor: pointer;">Cari</button>
-    </form>
+    <form method="get" style="width: 100%; margin-bottom: 20px;">
+  <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+    <input type="text" name="q" placeholder="Cari berdasarkan ID Laporan..." value="{{ query }}" style="flex: 1; min-width: 250px; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+    <input type="month" name="bulan" value="{{ bulan }}" style="padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+    <button type="submit" style="padding: 10px 15px; border: none; background-color: #6c5ce7; color: white; border-radius: 8px; font-weight: bold; cursor: pointer;">Cari</button>
+  </div>
+</form>
 
-    {% if data %}
-    <table>
-      <thead>
-        <tr>
-          <th>ID Laporan</th>
-          <th>Username</th>
-          <th>Judul Buku</th>
-          <th>Tanggal Pinjam</th>
-          <th>Rencana Kembali</th>
-          <th>Waktu Dikembalikan</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in data %}
+<form method="get" action="{% url 'export_excel' %}" class="export-form">
+  <label for="bulan">Pilih Bulan:</label>
+  <input type="month" name="bulan" id="bulan">
+  <button type="submit">Export Excel</button>
+</form>
+
+    {% if peminjaman %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID Laporan</th>
+        <th>Username</th>
+        <th>Judul Buku</th>
+        <th>Tanggal Pinjam</th>
+        <th>Rencana Kembali</th>
+        <th>Waktu Dikembalikan</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in peminjaman %}
         <tr>
           <td data-label="ID Laporan">{{ item.kode_laporan }}</td>
           <td data-label="Username">{{ item.user.username }}</td>
@@ -183,17 +290,43 @@
             {% endif %}
           </td>
         </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-      <p style="text-align:center;">Tidak ada data peminjaman tersedia.</p>
-    {% endif %}
-
-    <div class="back-link">
-      <a href="{% url 'dashboard_admin' %}">← Kembali ke Dashboard</a>
-    </div>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <div style="height: 300px; display: flex; justify-content: center; align-items: center;">
+    <div class="empty-message">Tidak ada data peminjaman ditemukan untuk filter yang dipilih.</div>
   </div>
+{% endif %}
+
+<!-- Fixed Footer Tetap Tampil -->
+<div class="fixed-footer">
+  <div class="pagination">
+    {% if peminjaman.has_other_pages %}
+      {% if peminjaman.has_previous %}
+        <a href="?q={{ query }}&bulan={{ bulan }}&page={{ peminjaman.previous_page_number }}">← Sebelumnya</a>
+      {% endif %}
+
+      {% for num in peminjaman.paginator.page_range %}
+        {% if peminjaman.number == num %}
+          <span class="current">{{ num }}</span>
+        {% else %}
+          <a href="?q={{ query }}&bulan={{ bulan }}&page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if peminjaman.has_next %}
+        <a href="?q={{ query }}&bulan={{ bulan }}&page={{ peminjaman.next_page_number }}">Selanjutnya →</a>
+      {% endif %}
+    {% else %}
+      <span class="no-pagination">1 Halaman</span>
+    {% endif %}
+  </div>
+
+  <div class="back-link">
+    <a href="{% url 'dashboard_admin' %}">← Kembali ke Dashboard</a>
+  </div>
+</div>
 
   <script>
     function openSidebar() {
