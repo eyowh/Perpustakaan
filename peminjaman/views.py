@@ -91,6 +91,7 @@ def update_profil(request):
 
 @login_required
 @login_required
+@login_required
 def pinjam_buku(request):
     user = request.user
     profil_lengkap = all([
@@ -129,18 +130,16 @@ def pinjam_buku(request):
 
         buku = get_object_or_404(Buku, id=buku_id)
 
+        # Buat peminjaman dengan status 'menunggu'
         Peminjaman.objects.create(
             user=request.user,
             buku=buku,
             tanggal_pinjam=tanggal_pinjam,
-            tanggal_kembali=tgl_kembali
+            tanggal_kembali=tgl_kembali,
+            status='menunggu'  # <-- penting
         )
 
-        buku.stok_buku -= 1
-        buku.jumlah_dipinjam += 1
-        buku.save()
-
-        messages.success(request, f'Buku "{buku.judul}" berhasil dipinjam.')
+        messages.success(request, f'Permintaan peminjaman buku "{buku.judul}" telah diajukan dan menunggu persetujuan admin.')
         return redirect('pinjam_buku')
 
     return render(request, 'user/pinjambuku.html', {
@@ -150,6 +149,7 @@ def pinjam_buku(request):
         'today': timezone.now().date().isoformat(),
         'nama': request.user.nama_panjang,
     })
+
 
 @login_required
 def kembalikan_buku(request, id):
@@ -328,3 +328,67 @@ def export_peminjaman_excel(request):
     wb.save(response)
     return response
 
+
+
+@login_required
+@user_passes_test(is_admin)
+def scan_pengembalian(request):
+    return render(request, 'admin/scan_qr_pengembalian.html')
+
+
+@login_required
+@user_passes_test(is_admin)
+def verifikasi_pengembalian(request, kode):
+    try:
+        peminjaman = Peminjaman.objects.get(
+            kode_laporan=kode,
+            status='disetujui',
+            tanggal_dikembalikan__isnull=True
+        )
+    except Peminjaman.DoesNotExist:
+        messages.error(request, "Data peminjaman tidak ditemukan atau buku sudah dikembalikan.")
+        return redirect('scan_pengembalian')
+
+    if request.method == 'POST':
+        peminjaman.tanggal_dikembalikan = timezone.now().date()
+        peminjaman.save()
+        peminjaman.buku.stok_buku += 1
+        peminjaman.buku.save()
+        messages.success(request, "Buku berhasil dikembalikan.")
+        return redirect('dashboard_admin')
+
+    return render(request, 'admin/verifikasi_pengembalian.html', {'peminjaman': peminjaman})
+
+@login_required
+@user_passes_test(is_admin)
+def scan_peminjaman(request):
+    return render(request, 'admin/scan_qr_peminjaman.html')
+
+@login_required
+@user_passes_test(is_admin)
+def verifikasi_peminjaman(request):
+    kode = request.GET.get('kode')
+    try:
+        peminjaman = Peminjaman.objects.get(kode_laporan=kode, status='menunggu')
+    except Peminjaman.DoesNotExist:
+        messages.error(request, "Peminjaman tidak ditemukan atau sudah diproses.")
+        return redirect('scan_peminjaman')
+
+    if request.method == 'POST':
+        aksi = request.POST.get('aksi')
+        if aksi == 'setujui':
+            peminjaman.status = 'disetujui'
+            peminjaman.buku.stok_buku -= 1
+            peminjaman.buku.jumlah_dipinjam += 1
+            peminjaman.buku.save()
+            peminjaman.save()
+            messages.success(request, "Peminjaman disetujui.")
+        elif aksi == 'tolak':
+            peminjaman.status = 'ditolak'
+            peminjaman.save()
+            messages.warning(request, "Peminjaman ditolak.")
+        return redirect('dashboard_admin')
+
+    return render(request, 'admin/verifikasi_peminjaman.html', {
+        'peminjaman': peminjaman
+    })

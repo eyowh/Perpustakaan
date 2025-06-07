@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-z%s(*lmerrgpi(cl56xx=uk_2w!suyzx0)9*0erm#ts(03803z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'peminjaman',
+    'sslserver',
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')    # untuk collectstatic (de
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')            # tempat upload gambar buku
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://66d0-114-4-78-231.ngrok-free.app"
+]

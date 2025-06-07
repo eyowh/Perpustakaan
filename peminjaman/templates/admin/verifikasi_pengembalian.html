@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Verifikasi Pengembalian Buku</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: url("{% static 'images/perpush3.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 0;
+    }
+
+    .box {
+      background-color: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      display: inline-block;
+      text-align: left;
+      max-width: 460px;
+      position: relative;
+      z-index: 1;
+      margin: auto;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2d3436;
+      margin-bottom: 20px;
+    }
+
+    p {
+      margin: 12px 0;
+      font-size: 15px;
+      color: #2f3542;
+    }
+
+    strong {
+      color: #0984e3;
+    }
+
+    button {
+      display: block;
+      margin: 20px auto 0;
+      padding: 12px 24px;
+      background-color: #00b894;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-size: 15px;
+    }
+
+    button:hover {
+      background-color: #019875;
+    }
+
+    .success {
+      color: #00b894;
+      font-weight: bold;
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .box {
+        padding: 20px;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>📦 Verifikasi Pengembalian</h2>
+
+    <p><strong>ID Laporan:</strong> {{ peminjaman.id }}</p>
+    <p><strong>Kode Laporan:</strong> {{ peminjaman.kode_laporan }}</p>
+    <p><strong>Nama Peminjam:</strong> {{ peminjaman.user.nama_panjang }}</p>
+    <p><strong>Judul Buku:</strong> {{ peminjaman.buku.judul }}</p>
+    <p><strong>Tanggal Pinjam:</strong> {{ peminjaman.tanggal_pinjam|date:"d M Y" }}</p>
+    <p><strong>Rencana Kembali:</strong> {{ peminjaman.tanggal_kembali|date:"d M Y" }}</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit">✅ Konfirmasi Pengembalian Buku</button>
+    </form>
+
+    {% if sukses %}
+      <p class="success">Pengembalian berhasil dikonfirmasi!</p>
+    {% endif %}
+  </div>
+</body>
+</html>

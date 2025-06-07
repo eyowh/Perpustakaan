@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Scan QR Pengembalian</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 40px;
+      background-color: #f5f6fa;
+    }
+    h2 {
+      color: #2d3436;
+    }
+    #reader {
+      width: 320px;
+      margin: 0 auto;
+      border: 2px solid #0984e3;
+      border-radius: 10px;
+      padding: 10px;
+      background-color: white;
+    }
+    .result {
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>📷 Scan QR Code Pengembalian Buku</h2>
+  <div id="reader"></div>
+  <div id="result" class="result"></div>
+  <div id="error" class="error"></div>
+
+  <script>
+    const reader = new Html5Qrcode("reader");
+
+    function onScanSuccess(decodedText, decodedResult) {
+      reader.stop().then(() => {
+        const resultDiv = document.getElementById("result");
+        const errorDiv = document.getElementById("error");
+
+        console.log("QR terbaca:", decodedText);
+
+        // Default kode adalah isi QR
+        let kode = decodedText;
+
+        // Jika pakai prefix "KEMBALI:", hilangkan
+        if (decodedText.startsWith("KEMBALI:")) {
+          kode = decodedText.replace("KEMBALI:", "").trim();
+        }
+
+        // Validasi sederhana
+        if (!kode || kode.length < 8) {
+          errorDiv.innerText = "❌ QR tidak valid.";
+          resultDiv.innerText = '';
+          return;
+        }
+
+        resultDiv.innerText = `✅ Kode ditemukan: ${kode}`;
+        // Redirect ke verifikasi berdasarkan URL yang sudah didefinisikan di urls.py
+        window.location.href = `/admin-panel/verifikasi/${kode}/`;
+      }).catch(err => {
+        document.getElementById("error").innerText = "❌ Gagal menghentikan scanner: " + err;
+      });
+    }
+
+    reader.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 250 },
+      onScanSuccess
+    ).catch(err => {
+      document.getElementById("error").innerText = "❌ Gagal membuka kamera: " + err;
+    });
+  </script>
+</body>
+</html>

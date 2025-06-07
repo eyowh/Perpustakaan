@@ -190,6 +190,7 @@
       margin: 2px 0;
       font-size: 13px;
       color: #636e72;
+      text-align: left;
     }
 
     .book-card form {
@@ -417,20 +418,27 @@
         <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
         <div class="info">
           <h4>{{ pem.buku.judul }}</h4>
-          <p>Dipinjam: {{ pem.tanggal_pinjam|date:"d M Y" }}</p>
-          <p>Harus kembali: {{ pem.tanggal_kembali|date:"d M Y" }}</p>
-          <p>Status: {{ pem.status_jatuh_tempo }}</p>
+          <p><strong>Kode Laporan:</strong> {{ pem.kode_laporan }}</p>
+          <p><strong>Dipinjam:</strong> {{ pem.tanggal_pinjam|date:"d M Y" }}</p>
+          <p><strong>Rencana Kembali:</strong> {{ pem.tanggal_kembali|date:"d M Y" }}</p>
+          <p><strong>Status Peminjaman:</strong>
+            {% if pem.status == 'menunggu' %}
+              <span style="color: #fdcb6e;">Menunggu Persetujuan</span>
+            {% elif pem.status == 'disetujui' %}
+              <span style="color: #00b894;">Disetujui</span>
+            {% elif pem.status == 'ditolak' %}
+              <span style="color: #d63031;">Ditolak</span>
+            {% endif %}
+          </p>
+          
         </div>
-        <form method="post" action="{% url 'kembalikan_buku' pem.id %}">
-          {% csrf_token %}
-          <button type="submit">Kembalikan</button>
-        </form>
       </div>
     {% endfor %}
   {% else %}
     <p style="color: #dfe6e9;">Anda belum meminjam buku.</p>
   {% endif %}
 </div>
+
 
   </div>
 

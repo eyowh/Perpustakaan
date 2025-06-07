@@ -218,82 +218,186 @@
     }
 
     .toggle-button.hidden { display: none; }
+
+    .qr-code {
+  display: none;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.qr-toggle-btn {
+  width: 100%;
+  background-color: #0984e3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.qr-toggle-btn:hover {
+  background-color: #074b8a;
+}
+
+.modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 12% auto;
+      padding: 30px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 10px; right: 15px;
+      color: #aaa;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close-modal:hover {
+      color: #000;
+    }
+
+    .modal-title {
+      font-weight: bold;
+      font-size: 16px;
+      color: #2d3436;
+    }
   </style>
 </head>
 <body>
 
-  <button id="menuBtn" class="toggle-button" onclick="toggleSidebar()">☰ Menu</button>
-
-  <div class="sidebar" id="sidebar">
-    <button class="close-btn" onclick="closeSidebar()">✖</button>
-    <h2>Perpustakaan</h2>
-    <div class="welcome">Halo, {{ nama }}!</div>
-    <div class="nav-group">
-      <h4>Menu</h4>
-      <a href="{% url 'dashboard_user' %}">Dashboard</a>
-      <a href="{% url 'pinjam_buku' %}">Pinjam Buku</a>
-      <a href="{% url 'buku_dipinjam_user' %}">Buku yang Dipinjam</a>
-    </div>
-    <div class="nav-group">
-      <h4>Profil</h4>
-      <a href="{% url 'update_profil' %}">Update Profil</a>
-    </div>
-    <div class="logout">
-      <a href="{% url 'logout' %}">Logout</a>
-    </div>
-    <div class="sidebar-footer">
+<button id="menuBtn" class="toggle-button" onclick="toggleSidebar()">☰ Menu</button>
+<div class="sidebar" id="sidebar">
+  <button class="close-btn" onclick="closeSidebar()">✖</button>
+  <h2>Perpustakaan</h2>
+  <div class="welcome">Halo, {{ nama }}!</div>
+  <div class="nav-group">
+    <h4>Menu</h4>
+    <a href="{% url 'dashboard_user' %}">Dashboard</a>
+    <a href="{% url 'pinjam_buku' %}">Pinjam Buku</a>
+    <a href="{% url 'buku_dipinjam_user' %}">Buku yang Dipinjam</a>
+  </div>
+  <div class="nav-group">
+    <h4>Profil</h4>
+    <a href="{% url 'update_profil' %}">Update Profil</a>
+  </div>
+  <div class="logout">
+    <a href="{% url 'logout' %}">Logout</a>
+  </div>
+  <div class="sidebar-footer">
     <p style="font-size: 0.8rem;">&copy; {% now "Y" %} Perpustakaan</p>
     <p style="font-size: 0.8rem;">Dibuat Oleh ario(raja) abim irgi bagus</p>
   </div>
-  </div>
+</div>
 
-  <div class="container">
-    <h2>Buku yang Sedang Anda Pinjam</h2>
+<!-- Konten Utama -->
+<div class="container">
+  <h2>Buku yang Sedang Anda Pinjam</h2>
 
-    {% if buku_dipinjam %}
-    <div class="book-list">
-      {% for pem in buku_dipinjam %}
-        <div class="book-card">
-          <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
-          <div class="info">
-            <h4>{{ pem.buku.judul }}</h4>
-            <p>Dipinjam: {{ pem.tanggal_pinjam }}</p>
-            <p>Rencana Kembali: {{ pem.tanggal_kembali }}</p>
-          </div>
-          <form method="post" action="{% url 'kembalikan_buku' pem.id %}">
-            {% csrf_token %}
-            <button type="submit" class="kembalikan">Kembalikan</button>
-          </form>
-        </div>
-      {% endfor %}
+  {% if buku_dipinjam %}
+  <div class="book-list">
+    {% for pem in buku_dipinjam %}
+    <div class="book-card">
+      <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
+      <div class="info">
+        <h4>{{ pem.buku.judul }}</h4>
+        <p><strong>ID Laporan:</strong> {{ pem.kode_laporan }}</p>
+        <p>Dipinjam: {{ pem.tanggal_pinjam }}</p>
+        <p>Rencana Kembali: {{ pem.tanggal_kembali }}</p>
+        <p>Status:
+          {% if pem.status == 'menunggu' %}
+            <span style="color: #fdcb6e;">Menunggu persetujuan</span>
+          {% elif pem.status == 'disetujui' %}
+            <span style="color: #00b894;">Disetujui</span>
+          {% elif pem.status == 'ditolak' %}
+            <span style="color: #d63031;">Ditolak</span>
+          {% endif %}
+        </p>
+
+        {% if pem.qr_code_image %}
+          {% if pem.status == 'menunggu' %}
+            <button class="qr-toggle-btn" onclick="showQRCodeModal('{{ pem.qr_code_image.url }}', 'QR Verifikasi Peminjaman - {{ pem.kode_laporan }}')">
+              Tampilkan QR Verifikasi Peminjaman
+            </button>
+          {% elif pem.status == 'disetujui' %}
+            <button class="qr-toggle-btn" onclick="showQRCodeModal('{{ pem.qr_code_image.url }}', 'QR Pengembalian Buku - {{ pem.kode_laporan }}')">
+              Tampilkan QR Pengembalian Buku
+            </button>
+          {% endif %}
+        {% endif %}
+      </div>
     </div>
-    {% else %}
-      <p style="text-align:center;">Anda belum meminjam buku apa pun.</p>
-    {% endif %}
-
-    <div class="back-link">
-      <a href="{% url 'dashboard_user' %}">← Kembali ke Dashboard</a>
-    </div>
+    {% endfor %}
   </div>
+  {% else %}
+    <p style="text-align:center;">Anda belum meminjam buku apa pun.</p>
+  {% endif %}
 
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      const menuBtn = document.getElementById("menuBtn");
+  <div class="back-link">
+    <a href="{% url 'dashboard_user' %}">← Kembali ke Dashboard</a>
+  </div>
+</div>
 
-      if (sidebar.classList.contains("active")) {
-        sidebar.classList.remove("active");
-        menuBtn.classList.remove("hidden");
-      } else {
-        sidebar.classList.add("active");
-        menuBtn.classList.add("hidden");
-      }
+<!-- Modal -->
+<div id="qrModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeModal()">&times;</span>
+    <p id="qr-title" class="modal-title">QR Code</p>
+    <img id="qr-image" src="" alt="QR Code" style="width: 150px; margin-top: 10px;">
+  </div>
+</div>
+
+<script>
+  function showQRCodeModal(imageUrl, title) {
+    const modal = document.getElementById("qrModal");
+    document.getElementById("qr-image").src = imageUrl;
+    document.getElementById("qr-title").textContent = title;
+    modal.style.display = "block";
+  }
+
+  function closeModal() {
+    document.getElementById("qrModal").style.display = "none";
+  }
+
+  window.onclick = function(event) {
+    const modal = document.getElementById("qrModal");
+    if (event.target === modal) {
+      closeModal();
     }
+  }
 
-    function closeSidebar() {
-      document.getElementById("sidebar").classList.remove("active");
-      document.getElementById("menuBtn").classList.remove("hidden");
-    }
-  </script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const menuBtn = document.getElementById("menuBtn");
+
+    sidebar.classList.toggle("active");
+    menuBtn.classList.toggle("hidden");
+  }
+
+  function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("active");
+    document.getElementById("menuBtn").classList.remove("hidden");
+  }
+</script>
+
 </body>
 </html>

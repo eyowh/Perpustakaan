@@ -257,6 +257,7 @@
     <h4 style="margin-bottom: 10px; font-size: 14px; color: #b2bec3; border-bottom: 1px solid #636e72; padding-bottom: 5px;">Laporan</h4>
     <a href="{% url 'laporan_peminjaman' %}">📄 Laporan Peminjaman</a>
     <a href="{% url 'biodata_user' %}">👤 Biodata Pengguna</a>
+    
   </div>
 
   <!-- Logout -->
@@ -292,9 +293,12 @@
 
   <div class="admin-menu">
     <a class="admin-card" href="{% url 'daftar_buku' %}">📘 Daftar Buku</a>
-    <a class="admin-card" href="{% url 'tambah_buku' %}">➕ Tambah Buku</a>
-    <a class="admin-card" href="{% url 'laporan_peminjaman' %}">📄 Laporan</a>
-    <a class="admin-card" href="{% url 'biodata_user' %}">👤 Biodata Pengguna</a>
+  <a class="admin-card" href="{% url 'tambah_buku' %}">➕ Tambah Buku</a>
+  <a class="admin-card" href="{% url 'laporan_peminjaman' %}">📄 Laporan</a>
+  <a class="admin-card" href="{% url 'biodata_user' %}">👤 Biodata Pengguna</a>
+  
+  <a class="admin-card" href="{% url 'scan_peminjaman' %}">📷 Scan Peminjaman Buku</a>
+  <a class="admin-card" href="{% url 'scan_pengembalian' %}">📦 Scan Pengembalian Buku</a>
   </div>
 </div>
 
