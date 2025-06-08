@@ -57,6 +57,14 @@ class PengembalianForm(forms.ModelForm):
         model = Peminjaman
         fields = []  # Pengembalian hanya perlu submit; logika tanggal akan diatur di views
 
+class KonfirmasiDendaForm(forms.ModelForm):
+    class Meta:
+        model = Peminjaman
+        fields = ['denda_dibayar']
+        labels = {
+            'denda_dibayar': 'Tandai sebagai lunas'
+        }
+
 class DetailPeminjamanForm(forms.ModelForm):
     class Meta:
         model = Peminjaman
@@ -81,3 +89,5 @@ class DetailPeminjamanForm(forms.ModelForm):
             self.add_error('tanggal_kembali', "Tanggal kembali harus setelah tanggal pinjam.")
 
         return cleaned_data
+    
+    

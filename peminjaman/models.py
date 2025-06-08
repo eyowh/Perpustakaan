@@ -72,6 +72,7 @@ class Peminjaman(models.Model):
         ('menunggu', 'Menunggu Persetujuan'),
         ('disetujui', 'Disetujui'),
         ('ditolak', 'Ditolak'),
+        ('dikembalikan', 'Dikembalikan'),
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -83,6 +84,8 @@ class Peminjaman(models.Model):
     kode_laporan = models.CharField(max_length=30, unique=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='menunggu')
     qr_code_image = models.ImageField(upload_to='qrcodes/', null=True, blank=True)
+    denda = models.IntegerField(default=0)
+    denda_dibayar = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.kode_laporan} - {self.user.username} - {self.buku.judul}"

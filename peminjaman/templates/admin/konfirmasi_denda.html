@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Konfirmasi Pembayaran Denda</title>
+</head>
+<body>
+  <h2>Konfirmasi Pembayaran Denda</h2>
+
+  <p><strong>Kode Laporan:</strong> {{ peminjaman.kode_laporan }}</p>
+  <p><strong>Nama:</strong> {{ peminjaman.user.nama_panjang }}</p>
+  <p><strong>Judul Buku:</strong> {{ peminjaman.buku.judul }}</p>
+  <p><strong>Denda:</strong> Rp{{ peminjaman.denda }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">💰 Tandai Lunas</button>
+  </form>
+
+  <a href="{% url 'laporan_peminjaman' %}">← Kembali ke Laporan</a>
+</body>
+</html>

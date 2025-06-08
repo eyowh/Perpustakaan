@@ -89,8 +89,7 @@ def update_profil(request):
         form = UpdateProfilForm(instance=request.user)
     return render(request, 'user/updateprofil.html', {'form': form})
 
-@login_required
-@login_required
+
 @login_required
 def pinjam_buku(request):
     user = request.user
@@ -150,7 +149,6 @@ def pinjam_buku(request):
         'nama': request.user.nama_panjang,
     })
 
-
 @login_required
 def kembalikan_buku(request, id):
     peminjaman = get_object_or_404(
@@ -171,19 +169,30 @@ def kembalikan_buku(request, id):
     messages.success(request, f'Buku "{buku.judul}" berhasil dikembalikan.')
     return redirect('dashboard_user')
 
+
+
+
+@login_required
 @login_required
 def buku_dipinjam_user(request):
-    buku_dipinjam = Peminjaman.objects.filter(
-        user=request.user,
-        tanggal_dikembalikan__isnull=True
-    ).select_related('buku')
+    today = timezone.localdate()
+    denda_per_hari = 10000
+
+    buku_dipinjam = Peminjaman.objects.filter(user=request.user).select_related('buku').order_by('-tanggal_pinjam')
+
+    # Tambahkan properti denda sementara ke setiap objek
+    for pem in buku_dipinjam:
+        if pem.status == 'disetujui' and pem.tanggal_kembali < today and not pem.tanggal_dikembalikan:
+            hari_telat = (today - pem.tanggal_kembali).days
+            pem.denda_terhitung = hari_telat * denda_per_hari
+        else:
+            pem.denda_terhitung = 0
 
     return render(request, 'user/bukudipinjamuser.html', {
         'buku_dipinjam': buku_dipinjam,
         'nama': request.user.nama_panjang,
-        
+        'today': today,
     })
-
 
 # --------------------- ADMIN ---------------------
 
@@ -247,11 +256,9 @@ def laporan_peminjaman(request):
 
     peminjaman_qs = Peminjaman.objects.all().order_by('-tanggal_pinjam')
 
-    # Filter berdasarkan kode laporan
     if query:
         peminjaman_qs = peminjaman_qs.filter(kode_laporan__icontains=query)
 
-    # Filter berdasarkan bulan dan tahun dari input <input type="month">
     if bulan:
         try:
             tahun, bulan_num = map(int, bulan.split('-'))
@@ -260,9 +267,8 @@ def laporan_peminjaman(request):
                 tanggal_pinjam__month=bulan_num
             )
         except ValueError:
-            pass  # Format tidak valid, abaikan saja
+            pass
 
-    # Pagination
     paginator = Paginator(peminjaman_qs, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -272,6 +278,7 @@ def laporan_peminjaman(request):
         'query': query,
         'bulan': bulan,
     })
+
 
 @login_required
 @user_passes_test(is_admin)
@@ -335,29 +342,56 @@ def export_peminjaman_excel(request):
 def scan_pengembalian(request):
     return render(request, 'admin/scan_qr_pengembalian.html')
 
+DENDA_PER_HARI = 10000
 
 @login_required
 @user_passes_test(is_admin)
 def verifikasi_pengembalian(request, kode):
-    try:
-        peminjaman = Peminjaman.objects.get(
-            kode_laporan=kode,
-            status='disetujui',
-            tanggal_dikembalikan__isnull=True
-        )
-    except Peminjaman.DoesNotExist:
-        messages.error(request, "Data peminjaman tidak ditemukan atau buku sudah dikembalikan.")
-        return redirect('scan_pengembalian')
+    peminjaman = get_object_or_404(
+        Peminjaman,
+        kode_laporan=kode,
+        status='disetujui',
+        tanggal_dikembalikan__isnull=True
+    )
+
+    today = timezone.now().date()
+    hari_telat = 0
+    perkiraan_denda = 0
+
+    # Hitung denda hanya jika terlambat (GET dan POST sama)
+    if today > peminjaman.tanggal_kembali:
+        hari_telat = (today - peminjaman.tanggal_kembali).days
+        perkiraan_denda = hari_telat * DENDA_PER_HARI
 
     if request.method == 'POST':
-        peminjaman.tanggal_dikembalikan = timezone.now().date()
+        peminjaman.tanggal_dikembalikan = today
+        peminjaman.status = 'dikembalikan'
+        peminjaman.denda = perkiraan_denda
+
         peminjaman.save()
-        peminjaman.buku.stok_buku += 1
-        peminjaman.buku.save()
-        messages.success(request, "Buku berhasil dikembalikan.")
+
+        # Tambahkan stok buku kembali
+        buku = peminjaman.buku
+        buku.stok_buku += 1
+        buku.save()
+
+        # Feedback ke admin
+        if perkiraan_denda > 0:
+            messages.warning(
+                request,
+                f"Buku dikembalikan dengan denda Rp{perkiraan_denda:,} untuk keterlambatan {hari_telat} hari."
+            )
+        else:
+            messages.success(request, "Buku berhasil dikembalikan tanpa denda.")
+
         return redirect('dashboard_admin')
 
-    return render(request, 'admin/verifikasi_pengembalian.html', {'peminjaman': peminjaman})
+    return render(request, 'admin/verifikasi_pengembalian.html', {
+        'peminjaman': peminjaman,
+        'today': today,
+        'hari_telat': hari_telat,
+        'perkiraan_denda': perkiraan_denda,
+    })
 
 @login_required
 @user_passes_test(is_admin)
@@ -391,4 +425,23 @@ def verifikasi_peminjaman(request):
 
     return render(request, 'admin/verifikasi_peminjaman.html', {
         'peminjaman': peminjaman
+    })
+
+@login_required
+@user_passes_test(is_admin)
+def konfirmasi_denda(request, id):
+    peminjaman = get_object_or_404(Peminjaman, id=id)
+
+    if request.method == 'POST':
+        form = KonfirmasiDendaForm(request.POST, instance=peminjaman)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Status denda berhasil diperbarui.")
+            return redirect('laporan_peminjaman')
+    else:
+        form = KonfirmasiDendaForm(instance=peminjaman)
+
+    return render(request, 'admin/konfirmasi_denda.html', {
+        'peminjaman': peminjaman,
+        'form': form
     })

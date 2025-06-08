@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'peminjaman',
     'sslserver',
 ]
@@ -133,5 +134,5 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')            # tempat upload gambar buku
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://66d0-114-4-78-231.ngrok-free.app"
+    "https://b877-114-10-119-48.ngrok-free.app"
 ]

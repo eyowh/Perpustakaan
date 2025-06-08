@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -53,6 +54,18 @@
       color: #0984e3;
     }
 
+    .denda {
+      color: #d63031;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .no-denda {
+      color: #00b894;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
     button {
       display: block;
       margin: 20px auto 0;
@@ -99,6 +112,13 @@
     <p><strong>Judul Buku:</strong> {{ peminjaman.buku.judul }}</p>
     <p><strong>Tanggal Pinjam:</strong> {{ peminjaman.tanggal_pinjam|date:"d M Y" }}</p>
     <p><strong>Rencana Kembali:</strong> {{ peminjaman.tanggal_kembali|date:"d M Y" }}</p>
+
+    {% if hari_telat > 0 %}
+      <p class="denda">⚠️ Buku ini terlambat {{ hari_telat }} hari</p>
+      <p class="denda">Perkiraan Denda: Rp{{ perkiraan_denda|intcomma }}</p>
+    {% else %}
+      <p class="no-denda">✅ Tidak ada keterlambatan.</p>
+    {% endif %}
 
     <form method="post">
       {% csrf_token %}

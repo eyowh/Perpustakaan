@@ -239,6 +239,13 @@
 
   <div class="container">
     <h2>Laporan Peminjaman Buku</h2>
+    {% if messages %}
+  <ul style="margin-bottom: 20px;">
+    {% for message in messages %}
+      <li style="color: green; font-weight: bold;">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
 
     <form method="get" style="width: 100%; margin-bottom: 20px;">
   <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
@@ -254,50 +261,79 @@
   <button type="submit">Export Excel</button>
 </form>
 
-    {% if peminjaman %}
+ {% if peminjaman %}
   <table>
     <thead>
-      <tr>
-        <th>ID Laporan</th>
-        <th>Username</th>
-        <th>Judul Buku</th>
-        <th>Tanggal Pinjam</th>
-        <th>Rencana Kembali</th>
-        <th>Waktu Dikembalikan</th>
-        <th>Status</th>
-      </tr>
-    </thead>
+  <tr>
+    <th>ID Laporan</th>
+    <th>Username</th>
+    <th>Judul Buku</th>
+    <th>Tanggal Pinjam</th>
+    <th>Rencana Kembali</th>
+    <th>Waktu Dikembalikan</th>
+    <th>Status</th>
+    <th>Denda</th> <!-- Baru -->
+    <th>Status Pembayaran</th> <!-- Baru -->
+  </tr>
+</thead>
     <tbody>
-      {% for item in peminjaman %}
-        <tr>
-          <td data-label="ID Laporan">{{ item.kode_laporan }}</td>
-          <td data-label="Username">{{ item.user.username }}</td>
-          <td data-label="Judul Buku">{{ item.buku.judul }}</td>
-          <td data-label="Tanggal Pinjam">{{ item.tanggal_pinjam|date:"Y-m-d" }}</td>
-          <td data-label="Rencana Kembali">{{ item.tanggal_kembali|date:"Y-m-d" }}</td>
-          <td data-label="Waktu Dikembalikan">
-            {% if item.tanggal_dikembalikan %}
-              <span class="kembali">{{ item.tanggal_dikembalikan|date:"Y-m-d" }}</span>
-            {% else %}
-              <span class="belum">-</span>
-            {% endif %}
-          </td>
-          <td data-label="Status" class="status {% if item.tanggal_dikembalikan %}dikembalikan{% else %}belum{% endif %}">
-            {% if item.tanggal_dikembalikan %}
-              Dikembalikan
-            {% else %}
-              Belum Dikembalikan
-            {% endif %}
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
+  {% for item in peminjaman %}
+    <tr>
+      <td data-label="ID Laporan">{{ item.kode_laporan }}</td>
+      <td data-label="Username">{{ item.user.username }}</td>
+      <td data-label="Judul Buku">{{ item.buku.judul }}</td>
+      <td data-label="Tanggal Pinjam">{{ item.tanggal_pinjam|date:"Y-m-d" }}</td>
+      <td data-label="Rencana Kembali">{{ item.tanggal_kembali|date:"Y-m-d" }}</td>
+      <td data-label="Waktu Dikembalikan">
+        {% if item.tanggal_dikembalikan %}
+          <span class="kembali">{{ item.tanggal_dikembalikan|date:"Y-m-d" }}</span>
+        {% else %}
+          <span class="belum">-</span>
+        {% endif %}
+      </td>
+      <td data-label="Status" class="status {% if item.tanggal_dikembalikan %}dikembalikan{% else %}belum{% endif %}">
+        {% if item.tanggal_dikembalikan %}
+          Dikembalikan
+        {% else %}
+          Belum Dikembalikan
+        {% endif %}
+      </td>
+      
+      <!-- Denda -->
+      <td data-label="Denda">
+        {% if item.denda > 0 %}
+          <strong style="color:#d63031;">Rp{{ item.denda }}</strong>
+        {% else %}
+          <span style="color: #636e72;">-</span>
+        {% endif %}
+      </td>
+      
+      <!-- Status Pembayaran -->
+      <td data-label="Status Pembayaran">
+        {% if item.denda > 0 %}
+          {% if item.denda_dibayar %}
+            <span style="color: green; font-weight: bold;">Sudah Dibayar</span>
+          {% else %}
+            <span style="color: red; font-weight: bold;">Belum Dibayar</span><br>
+            <a href="{% url 'konfirmasi_denda' item.id %}" 
+              style="background-color:#00b894; color:white; padding:6px 12px; border-radius:4px; text-decoration:none; font-size: 13px; display:inline-block; margin-top:4px;">
+              Tandai Lunas
+            </a>
+          {% endif %}
+        {% else %}
+          <span style="color: #636e72;">Tidak Ada Denda</span>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+</tbody>
   </table>
 {% else %}
   <div style="height: 300px; display: flex; justify-content: center; align-items: center;">
     <div class="empty-message">Tidak ada data peminjaman ditemukan untuk filter yang dipilih.</div>
   </div>
 {% endif %}
+
 
 <!-- Fixed Footer Tetap Tampil -->
 <div class="fixed-footer">

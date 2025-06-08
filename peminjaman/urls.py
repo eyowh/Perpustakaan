@@ -29,4 +29,5 @@ urlpatterns = [
 path('admin-panel/verifikasi/<str:kode>/', views.verifikasi_pengembalian, name='verifikasi_pengembalian'),
 path('admin-panel/scan-peminjaman/', views.scan_peminjaman, name='scan_peminjaman'),
 path('admin-panel/verifikasi-peminjaman/', views.verifikasi_peminjaman, name='verifikasi_peminjaman'),
+path('admin-panel/konfirmasi-denda/<int:id>/', views.konfirmasi_denda, name='konfirmasi_denda'),
 ]

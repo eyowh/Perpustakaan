@@ -1,3 +1,4 @@
+{% load humanize %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="id">
@@ -314,48 +315,120 @@
   <h2>Buku yang Sedang Anda Pinjam</h2>
 
   {% if buku_dipinjam %}
-  <div class="book-list">
-    {% for pem in buku_dipinjam %}
-    <div class="book-card">
-      <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
-      <div class="info">
-        <h4>{{ pem.buku.judul }}</h4>
-        <p><strong>ID Laporan:</strong> {{ pem.kode_laporan }}</p>
-        <p>Dipinjam: {{ pem.tanggal_pinjam }}</p>
-        <p>Rencana Kembali: {{ pem.tanggal_kembali }}</p>
-        <p>Status:
-          {% if pem.status == 'menunggu' %}
-            <span style="color: #fdcb6e;">Menunggu persetujuan</span>
-          {% elif pem.status == 'disetujui' %}
-            <span style="color: #00b894;">Disetujui</span>
-          {% elif pem.status == 'ditolak' %}
-            <span style="color: #d63031;">Ditolak</span>
-          {% endif %}
-        </p>
-
-        {% if pem.qr_code_image %}
-          {% if pem.status == 'menunggu' %}
-            <button class="qr-toggle-btn" onclick="showQRCodeModal('{{ pem.qr_code_image.url }}', 'QR Verifikasi Peminjaman - {{ pem.kode_laporan }}')">
-              Tampilkan QR Verifikasi Peminjaman
-            </button>
-          {% elif pem.status == 'disetujui' %}
-            <button class="qr-toggle-btn" onclick="showQRCodeModal('{{ pem.qr_code_image.url }}', 'QR Pengembalian Buku - {{ pem.kode_laporan }}')">
-              Tampilkan QR Pengembalian Buku
-            </button>
-          {% endif %}
+    {# MENUNGGU PERSETUJUAN #}
+    <h3 style="margin-top: 30px;">📥 Menunggu Persetujuan</h3>
+    <div class="book-list">
+      {% for pem in buku_dipinjam %}
+        {% if pem.status == 'menunggu' %}
+        <div class="book-card">
+          <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
+          <div class="info">
+            <h4>{{ pem.buku.judul }}</h4>
+            <p><strong>ID Laporan:</strong> {{ pem.kode_laporan }}</p>
+            <p>Dipinjam: {{ pem.tanggal_pinjam }}</p>
+            <p>Rencana Kembali: {{ pem.tanggal_kembali }}</p>
+            <p>Status: <span style="color: #fdcb6e;">Menunggu persetujuan</span></p>
+            {% if pem.qr_code_image %}
+              <button class="qr-toggle-btn" onclick="showQRCodeModal('{{ pem.qr_code_image.url }}', 'QR Verifikasi Peminjaman - {{ pem.kode_laporan }}')">
+                Tampilkan QR Verifikasi Peminjaman
+              </button>
+            {% endif %}
+          </div>
+        </div>
         {% endif %}
-      </div>
+      {% endfor %}
     </div>
-    {% endfor %}
-  </div>
+
+    {# DISETUJUI / DIPINJAM #}
+    <h3 style="margin-top: 40px;">✅ Dipinjam / Disetujui</h3>
+    <div class="book-list">
+      {% for pem in buku_dipinjam %}
+        {% if pem.status == 'disetujui' %}
+        <div class="book-card">
+          <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
+          <div class="info">
+            <h4>{{ pem.buku.judul }}</h4>
+            <p><strong>ID Laporan:</strong> {{ pem.kode_laporan }}</p>
+            <p>Dipinjam: {{ pem.tanggal_pinjam }}</p>
+            <p>Rencana Kembali: {{ pem.tanggal_kembali }}</p>
+           <p>Status: 
+  {% if pem.status == 'disetujui' and pem.tanggal_kembali < today and not pem.tanggal_dikembalikan %}
+    <span style="color: #d63031; font-weight: bold;">Terlambat</span>
+    <br><span style="color: red;"><strong>Denda: Rp{{ pem.denda_terhitung|intcomma }}</strong></span>
   {% else %}
-    <p style="text-align:center;">Anda belum meminjam buku apa pun.</p>
+    <span style="color: #00b894;">Disetujui</span>
+  {% endif %}
+</p>
+
+            {% if pem.qr_code_image %}
+              <button class="qr-toggle-btn" onclick="showQRCodeModal('{{ pem.qr_code_image.url }}', 'QR Pengembalian Buku - {{ pem.kode_laporan }}')">
+                Tampilkan QR Pengembalian Buku
+              </button>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {# DITOLAK #}
+    <h3 style="margin-top: 40px;">❌ Ditolak</h3>
+    <div class="book-list">
+      {% for pem in buku_dipinjam %}
+        {% if pem.status == 'ditolak' %}
+        <div class="book-card">
+          <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
+          <div class="info">
+            <h4>{{ pem.buku.judul }}</h4>
+            <p><strong>ID Laporan:</strong> {{ pem.kode_laporan }}</p>
+            <p>Dipinjam: {{ pem.tanggal_pinjam }}</p>
+            <p>Rencana Kembali: {{ pem.tanggal_kembali }}</p>
+            <p>Status: <span style="color: #d63031;">Ditolak</span></p>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {# DIKEMBALIKAN #}
+    <h3 style="margin-top: 40px;">📚 Riwayat Pengembalian</h3>
+    <div class="book-list">
+      {% for pem in buku_dipinjam %}
+        {% if pem.status == 'dikembalikan' %}
+        <div class="book-card">
+          <img src="{{ pem.buku.gambar.url|default:'https://via.placeholder.com/200x280?text=No+Image' }}" alt="{{ pem.buku.judul }}">
+          <div class="info">
+            <h4>{{ pem.buku.judul }}</h4>
+            <p><strong>ID Laporan:</strong> {{ pem.kode_laporan }}</p>
+            <p>Dipinjam: {{ pem.tanggal_pinjam }}</p>
+            <p>Rencana Kembali: {{ pem.tanggal_kembali }}</p>
+            <p>Dikembalikan: {{ pem.tanggal_dikembalikan }}</p>
+            <p>Status: <span style="color: #636e72;">Dikembalikan</span></p>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="text-align:center;">Anda belum memiliki riwayat peminjaman buku.</p>
   {% endif %}
 
-  <div class="back-link">
+  {% if pem.status == 'dikembalikan' and pem.denda > 0 %}
+  <p style="color: red;"><strong>Denda:</strong> Rp{{ pem.denda }}</p>
+  <p>Status Denda: 
+    {% if pem.denda_dibayar %}
+      <span style="color: green;">Sudah Dibayar</span>
+    {% else %}
+      <span style="color: red;">Belum Dibayar</span>
+    {% endif %}
+  </p>
+{% endif %}
+
+  <div class="back-link" style="margin-top: 40px;">
     <a href="{% url 'dashboard_user' %}">← Kembali ke Dashboard</a>
   </div>
 </div>
+
 
 <!-- Modal -->
 <div id="qrModal" class="modal">
