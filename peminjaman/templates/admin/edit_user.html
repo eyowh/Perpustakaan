@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Pengguna</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f1f2f6;
+    }
+
+    .form-container {
+      background: white;
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .actions {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .actions button {
+      padding: 10px 20px;
+      background: #00b894;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .actions a {
+      margin-left: 15px;
+      color: #636e72;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Edit Pengguna</h2>
+    <form method="post">
+      {% csrf_token %}
+      <label>Username:</label>
+      <input type="text" name="username" value="{{ user.username }}">
+
+      <label>Nama Panjang:</label>
+      <input type="text" name="nama_panjang" value="{{ user.nama_panjang }}">
+
+      <label>Email:</label>
+      <input type="email" name="email" value="{{ user.email }}">
+
+      <label>Jenis Kelamin:</label>
+      <select name="jenis_kelamin">
+        <option value="L" {% if user.jenis_kelamin == 'L' %}selected{% endif %}>Laki-laki</option>
+        <option value="P" {% if user.jenis_kelamin == 'P' %}selected{% endif %}>Perempuan</option>
+      </select>
+
+      <label>Tanggal Lahir:</label>
+      <input type="date" name="tgl_lahir" value="{{ user.tgl_lahir|date:'Y-m-d' }}">
+
+      <label>Alamat:</label>
+      <input type="text" name="alamat" value="{{ user.alamat }}">
+
+      <div class="actions">
+        <button type="submit">Simpan</button>
+        <a href="{% url 'biodata_user' %}">Batal</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

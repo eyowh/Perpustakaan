@@ -21,6 +21,7 @@ class User(AbstractUser):
     )
     jenis_kelamin = models.CharField(max_length=1, choices=JENIS_KELAMIN_CHOICES, blank=True)
     kode_user = models.CharField(max_length=20, unique=True, blank=True, null=True)
+    sudah_update_profil = models.BooleanField(default=False)
 
     def generate_kode_user(self):
         prefix = '2209'

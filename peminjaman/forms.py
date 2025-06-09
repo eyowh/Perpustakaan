@@ -37,6 +37,16 @@ class UpdateProfilForm(forms.ModelForm):
             'tgl_lahir': forms.DateInput(attrs={'type': 'date'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.get('instance')
+        super().__init__(*args, **kwargs)
+
+        if user and user.sudah_update_profil:
+            # Disable semua field kecuali tgl_lahir dan alamat
+            self.fields['nama_panjang'].disabled = True
+            self.fields['email'].disabled = True
+            self.fields['jenis_kelamin'].disabled = True
+
 class TambahBukuForm(forms.ModelForm):
     class Meta:
         model = Buku

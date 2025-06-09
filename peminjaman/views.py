@@ -80,13 +80,22 @@ def dashboard_user(request):
 
 @login_required
 def update_profil(request):
+    user = request.user
+
     if request.method == 'POST':
-        form = UpdateProfilForm(request.POST, instance=request.user)
+        form = UpdateProfilForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
+
+            # Tandai bahwa user sudah pernah update profil
+            if not user.sudah_update_profil:
+                user.sudah_update_profil = True
+                user.save(update_fields=['sudah_update_profil'])
+
             return redirect('update_profil')
     else:
-        form = UpdateProfilForm(instance=request.user)
+        form = UpdateProfilForm(instance=user)
+
     return render(request, 'user/updateprofil.html', {'form': form})
 
 
@@ -283,8 +292,29 @@ def laporan_peminjaman(request):
 @login_required
 @user_passes_test(is_admin)
 def biodata_user(request):
+    query = request.GET.get('q')
     users = User.objects.filter(is_staff=False)
+    if query:
+        users = users.filter(Q(username__icontains=query) | Q(nama_panjang__icontains=query))
     return render(request, 'admin/biodatauser.html', {'users': users})
+
+def edit_user(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    if request.method == 'POST':
+        user.username = request.POST.get('username')
+        user.nama_panjang = request.POST.get('nama_panjang')
+        user.email = request.POST.get('email')
+        user.jenis_kelamin = request.POST.get('jenis_kelamin')
+        user.tgl_lahir = request.POST.get('tgl_lahir')
+        user.alamat = request.POST.get('alamat')
+        user.save()
+        return redirect('biodata_user')
+    return render(request, 'admin/edit_user.html', {'user': user})
+
+def hapus_user(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    user.delete()
+    return redirect('biodata_user')
 
 @login_required
 @user_passes_test(is_admin)

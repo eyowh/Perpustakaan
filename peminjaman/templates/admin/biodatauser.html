@@ -147,13 +147,14 @@
     }
 
     .container {
-      max-width: 1100px;
+      
       margin: 0 auto;
       background-color: white;
       padding: 40px;
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
       overflow-x: auto;
+      min-width: 1300px;
     }
 
     h2 {
@@ -168,10 +169,14 @@
     }
 
     th, td {
-      padding: 12px 15px;
-      border-bottom: 1px solid #dfe6e9;
-      text-align: left;
-    }
+  padding: 12px 15px;
+  border-bottom: 1px solid #dfe6e9;
+  text-align: center;
+  vertical-align: middle;        /* ⬅ Tengah secara vertikal */
+  word-wrap: break-word;         /* ⬅ Bungkus kata */
+  white-space: normal;           /* ⬅ Izinkan turun baris */
+  max-width: 180px;              /* ⬅ Batasi lebar kolom agar wrap jalan */
+}
 
     th {
       background-color: #fab1a0;
@@ -206,6 +211,40 @@
         font-size: 13px;
       }
     }
+
+
+   .btn-edit, .btn-delete {
+  display: inline-block;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  text-decoration: none;
+  color: white;
+  margin-right: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.5px;
+}
+
+.btn-edit {
+  background-color: #0984e3;
+}
+
+.btn-edit:hover {
+  background-color: #74b9ff;
+  transform: scale(1.05);
+}
+
+.btn-delete {
+  background-color: #d63031;
+}
+
+.btn-delete:hover {
+  background-color: #ff7675;
+  transform: scale(1.05);
+}
+
   </style>
 </head>
 <body>
@@ -251,6 +290,11 @@
     <h2>Biodata Pengguna</h2>
 
     {% if users %}
+    <form method="get" style="margin-bottom: 20px; text-align: right;">
+  <input type="text" name="q" placeholder="Cari username atau nama..." value="{{ request.GET.q|default:'' }}" style="padding: 6px 10px; border-radius: 5px; border: 1px solid #ccc;">
+  <button type="submit" style="padding: 6px 12px; background-color: #0984e3; color: white; border: none; border-radius: 5px;">Cari</button>
+</form>
+
     <table>
       <thead>
         <tr>
@@ -261,6 +305,8 @@
           <th>Email</th>
           <th>Tanggal Lahir</th>
           <th>Alamat</th>
+          <th>Aksi</th>
+
         </tr>
       </thead>
       <tbody>
@@ -281,7 +327,15 @@
           <td>{{ user.email|default:"-" }}</td>
           <td>{{ user.tgl_lahir|date:"d M Y"|default:"-" }}</td>
           <td>{{ user.alamat|default:"-" }}</td>
+         <td>
+  <div style="white-space: nowrap;">
+    <a href="{% url 'edit_user' user.id %}" class="btn-edit">✏️ Edit</a>
+    <a href="{% url 'hapus_user' user.id %}" class="btn-delete" onclick="return confirm('Yakin ingin menghapus pengguna ini?');">🗑️ Hapus</a>
+  </div>
+</td>
+
         </tr>
+        
         {% endfor %}
       </tbody>
     </table>

@@ -23,6 +23,8 @@ urlpatterns = [
     path('admin-panel/hapus-buku/<int:id>/', views.hapus_buku, name='hapus_buku'),
     path('admin-panel/laporan-peminjaman/', views.laporan_peminjaman, name='laporan_peminjaman'),
     path('admin-panel/biodata-user/', views.biodata_user, name='biodata_user'),
+    path('admin-panel/biodata/edit/<int:user_id>/', views.edit_user, name='edit_user'),
+    path('admin-panel/biodata/hapus/<int:user_id>/', views.hapus_user, name='hapus_user'),
     
     path('export-excel/', views.export_peminjaman_excel, name='export_excel'),
     path('admin-panel/scan-pengembalian/', views.scan_pengembalian, name='scan_pengembalian'),
